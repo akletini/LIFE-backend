@@ -12,6 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("test")
@@ -26,7 +27,7 @@ public class TagServiceTest {
     @Test
     public void changeNameFailed() {
         // Given
-        Tag tag = TestTodos.uniTag;
+        Tag tag = TestTodos.getUniTag();
         tag = tagService.store(tag);
 
         // When
@@ -36,6 +37,7 @@ public class TagServiceTest {
 
         // Then
         assertThrows(TagStoreException.class, () -> tagService.store(newTag));
+        assertEquals(tag.getName(), tagService.getById(tag.getId()).getName());
     }
 
 }
