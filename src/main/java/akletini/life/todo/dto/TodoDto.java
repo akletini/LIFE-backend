@@ -1,6 +1,5 @@
 package akletini.life.todo.dto;
 
-import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.repository.entity.Todo;
 import lombok.Data;
 
@@ -15,7 +14,7 @@ public class TodoDto {
     private String dueAt;
     private String description;
 
-    private Tag tag;
+    private TagDto tag;
 
     private File attachedFile;
 
