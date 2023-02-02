@@ -57,9 +57,13 @@ tasks.named("dockerRun") {
 }
 tasks.getByName("dockerRun").finalizedBy(tasks.getByName("test"))
 
-tasks.named("test") {
+test {
     dependsOn(tasks.getByName("dockerRun"))
     useJUnitPlatform()
+
+    testLogging {
+        events "PASSED", "SKIPPED", "FAILED"
+    }
 }
 
 tasks.named("dockerStop") {
