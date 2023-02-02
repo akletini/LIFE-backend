@@ -1,6 +1,7 @@
 package akletini.life.todo.service.impl;
 
-import akletini.life.todo.exception.custom.TodoNotFoundException;
+import akletini.life.todo.exception.custom.TagNotFoundException;
+import akletini.life.todo.exception.custom.TagStoreException;
 import akletini.life.todo.repository.api.TagRepository;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.service.api.TagService;
@@ -19,9 +20,10 @@ public class TagServiceImpl implements TagService {
 
     public Tag store(Tag tag) {
         if (tag != null) {
+            validateUniqueName(tag);
             return tagRepository.save(tag);
         }
-        throw new RuntimeException("Could not store Tag object");
+        throw new TagStoreException("Could not store Tag object");
     }
 
     @Override
@@ -30,7 +32,7 @@ public class TagServiceImpl implements TagService {
         if (tagById.isPresent()) {
             return tagById.get();
         }
-        throw new TodoNotFoundException("Could not find Tag with ID " + id);
+        throw new TagNotFoundException("Could not find Tag with ID " + id);
     }
 
     @Override
@@ -44,4 +46,10 @@ public class TagServiceImpl implements TagService {
         tagRepository.deleteById(id);
     }
 
+    private void validateUniqueName(Tag tag) {
+        Optional<Tag> getByName = tagRepository.findByName(tag.getName());
+        if (getByName.isPresent()) {
+            throw new TagStoreException("Tag name is not unique");
+        }
+    }
 }

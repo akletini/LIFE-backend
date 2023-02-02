@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -14,5 +16,24 @@ spring:
 springdoc:
   api-docs:
     path: /api-docs
+name: dev-yaml
 server:
   port: 6969
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop # update for prod
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:54321/postgres
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+name: test-yaml

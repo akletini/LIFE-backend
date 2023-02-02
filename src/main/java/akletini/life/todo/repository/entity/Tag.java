@@ -1,18 +1,14 @@
 package akletini.life.todo.repository.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "tags")
 public class Tag implements Serializable {
@@ -22,4 +18,13 @@ public class Tag implements Serializable {
     private Long id;
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "tag")
+    @ToString.Exclude
+    private List<Todo> assignedTodos;
+
+    @PreRemove
+    private void preRemove() {
+        assignedTodos.forEach(todo -> todo.setTag(null));
+    }
 }

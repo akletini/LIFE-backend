@@ -29,7 +29,7 @@ public class TagController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedTag);
     }
 
-    @DeleteMapping(value = "/delete")
+    @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<Tag> deleteTag(@PathVariable Long id) {
         tagService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).build();

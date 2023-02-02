@@ -4,10 +4,10 @@ import akletini.life.todo.exception.custom.TodoNotFoundException;
 import akletini.life.todo.exception.custom.TodoStoreException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class TodoExceptionHandler {
 
     @ExceptionHandler(TodoNotFoundException.class)

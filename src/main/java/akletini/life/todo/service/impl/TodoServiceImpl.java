@@ -1,5 +1,7 @@
 package akletini.life.todo.service.impl;
 
+import akletini.life.todo.exception.custom.TodoNotFoundException;
+import akletini.life.todo.exception.custom.TodoStoreException;
 import akletini.life.todo.repository.api.TodoRepository;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.TodoService;
@@ -20,7 +22,7 @@ public class TodoServiceImpl implements TodoService {
         if (todo != null) {
             return todoRepository.save(todo);
         }
-        throw new RuntimeException("Could not store Todo object");
+        throw new TodoStoreException("Could not store Todo object");
     }
 
     @Override
@@ -29,7 +31,7 @@ public class TodoServiceImpl implements TodoService {
         if (todoById.isPresent()) {
             return todoById.get();
         }
-        throw new RuntimeException("Could not find Todo with ID " + id);
+        throw new TodoNotFoundException("Could not find Todo with ID " + id);
     }
 
     @Override
