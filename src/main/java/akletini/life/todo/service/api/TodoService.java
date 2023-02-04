@@ -10,5 +10,9 @@ public interface TodoService {
 
     List<Todo> getAll();
 
-    void delete(Long id);
+    void delete(Todo todo);
+
+    void setAccessToken(String accessToken);
+
+    String getAccessToken();
 }

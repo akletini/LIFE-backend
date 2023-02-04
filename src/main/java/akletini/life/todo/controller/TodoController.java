@@ -19,11 +19,12 @@ public class TodoController {
     @Autowired
     private TodoService todoService;
 
-    private TodoMapper todoMapper = Mappers.getMapper(TodoMapper.class);
+    private final TodoMapper todoMapper = Mappers.getMapper(TodoMapper.class);
 
     @PostMapping(value = "/add")
     public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) {
         Todo todo = todoMapper.dtoToTodo(todoDto);
+        todoService.setAccessToken("");
         Todo storedTodo = todoService.store(todo);
         return ResponseEntity.status(HttpStatus.OK).body(todoMapper.todoToDto(storedTodo));
     }
@@ -31,21 +32,24 @@ public class TodoController {
     @PutMapping(value = "/update")
     public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto) {
         Todo todo = todoMapper.dtoToTodo(todoDto);
+//        todoService.setAccessToken(todoDto.getTaskAccessToken());
         todoService.getById(todo.getId());
         Todo updatedtodo = todoService.store(todo);
         return ResponseEntity.status(HttpStatus.OK).body(todoMapper.todoToDto(updatedtodo));
     }
 
-    @DeleteMapping(value = "/delete/{id}")
-    public ResponseEntity<TodoDto> deleteTodo(@PathVariable Long id) {
-        todoService.delete(id);
+    @DeleteMapping(value = "/delete")
+    public ResponseEntity<TodoDto> deleteTodo(@RequestBody TodoDto todoDto) {
+        Todo todo = todoMapper.dtoToTodo(todoDto);
+        todoService.delete(todo);
+//        todoService.setAccessToken(todoDto.getTaskAccessToken());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<TodoDto>> getAllTodos() {
         List<Todo> allTodos = todoService.getAll();
-        List<TodoDto> allToDto = allTodos.stream().map(todo -> todoMapper.todoToDto(todo)).toList();
+        List<TodoDto> allToDto = allTodos.stream().map(todoMapper::todoToDto).toList();
         return ResponseEntity.status(HttpStatus.OK).body(allToDto);
     }
 

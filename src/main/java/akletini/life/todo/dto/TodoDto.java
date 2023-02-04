@@ -1,5 +1,6 @@
 package akletini.life.todo.dto;
 
+import akletini.life.login.repository.entity.User;
 import akletini.life.todo.repository.entity.Todo;
 import lombok.Data;
 
@@ -19,4 +20,6 @@ public class TodoDto {
     private File attachedFile;
 
     private Todo.State state;
+
+    private User assignedUser;
 }

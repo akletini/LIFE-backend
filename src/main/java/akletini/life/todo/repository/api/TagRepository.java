@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface TagRepository extends CrudRepository<Tag, Long> {
 
     @Query("from Tag t where t.name=:tagName")
-    public Optional<Tag> findByName(@Param("tagName") String tagName);
+    Optional<Tag> findByName(@Param("tagName") String tagName);
 
 }
