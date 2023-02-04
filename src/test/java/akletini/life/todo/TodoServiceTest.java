@@ -6,7 +6,11 @@ import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.TagService;
 import akletini.life.todo.service.api.TodoService;
 import akletini.life.todo.structure.TestTodos;
+import akletini.life.user.repository.api.UserRepository;
+import akletini.life.user.repository.entity.User;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,12 +20,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 
+import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class TodoServiceTest {
 
@@ -30,6 +36,15 @@ public class TodoServiceTest {
 
     @Autowired
     TodoService todoService;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @BeforeAll
+    public void initDB() {
+        User defaultCredentialUser = getDefaultCredentialUser();
+        userRepository.save(defaultCredentialUser);
+    }
 
     @Test
     public void removeUsedTag() {

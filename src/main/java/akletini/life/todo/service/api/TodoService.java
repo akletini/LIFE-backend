@@ -12,7 +12,4 @@ public interface TodoService {
 
     void delete(Todo todo);
 
-    void setAccessToken(String accessToken);
-
-    String getAccessToken();
 }

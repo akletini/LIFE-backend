@@ -3,6 +3,8 @@ package akletini.life.todo.structure;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.repository.entity.Todo;
 
+import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
+
 public class TestTodos {
 
     public static Todo getStandardTodo() {
@@ -12,6 +14,7 @@ public class TestTodos {
         todo.setState(Todo.State.OPEN);
         todo.setCreatedAt("01.02.2023 14:00:00");
         todo.setDueAt("02.02.2023");
+        todo.setAssignedUser(getDefaultCredentialUser());
         return todo;
     }
 

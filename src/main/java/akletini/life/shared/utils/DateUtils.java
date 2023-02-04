@@ -1,4 +1,4 @@
-package akletini.life.shared;
+package akletini.life.shared.utils;
 
 public class DateUtils {
 

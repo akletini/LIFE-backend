@@ -24,7 +24,6 @@ public class TodoController {
     @PostMapping(value = "/add")
     public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) {
         Todo todo = todoMapper.dtoToTodo(todoDto);
-        todoService.setAccessToken("");
         Todo storedTodo = todoService.store(todo);
         return ResponseEntity.status(HttpStatus.OK).body(todoMapper.todoToDto(storedTodo));
     }
@@ -32,7 +31,6 @@ public class TodoController {
     @PutMapping(value = "/update")
     public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto) {
         Todo todo = todoMapper.dtoToTodo(todoDto);
-//        todoService.setAccessToken(todoDto.getTaskAccessToken());
         todoService.getById(todo.getId());
         Todo updatedtodo = todoService.store(todo);
         return ResponseEntity.status(HttpStatus.OK).body(todoMapper.todoToDto(updatedtodo));
@@ -42,7 +40,6 @@ public class TodoController {
     public ResponseEntity<TodoDto> deleteTodo(@RequestBody TodoDto todoDto) {
         Todo todo = todoMapper.dtoToTodo(todoDto);
         todoService.delete(todo);
-//        todoService.setAccessToken(todoDto.getTaskAccessToken());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
