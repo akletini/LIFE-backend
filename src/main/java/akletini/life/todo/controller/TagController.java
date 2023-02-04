@@ -19,7 +19,7 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
-    private TagMapper tagMapper = Mappers.getMapper(TagMapper.class);
+    private final TagMapper tagMapper = Mappers.getMapper(TagMapper.class);
 
     @PostMapping(value = "/add")
     public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {

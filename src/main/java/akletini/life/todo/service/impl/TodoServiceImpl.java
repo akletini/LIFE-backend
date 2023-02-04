@@ -7,6 +7,7 @@ import akletini.life.todo.repository.api.TodoRepository;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.GoogleTaskService;
 import akletini.life.todo.service.api.TodoService;
+import akletini.life.user.repository.entity.AuthProvider;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,20 +27,26 @@ public class TodoServiceImpl implements TodoService {
     @Autowired
     private TodoRepository todoRepository;
 
-    String googleAccessToken;
-
     @Override
     public Todo store(Todo todo) {
         if (todo != null) {
             validateCreatedDateUnchanged(todo);
             validateDateFormats(todo);
-            if (googleAccessToken != null ) {
-                googleTaskService.storeTask(todo, googleAccessToken);
-                googleAccessToken = null;
+            if (todo.getAssignedUser().getAuthProvider().equals(AuthProvider.GOOGLE)) {
+                googleTaskService.storeTask(todo);
             }
+
             return todoRepository.save(todo);
         }
         throw new TodoStoreException("Could not store Todo object");
+    }
+
+    @Override
+    public void delete(Todo todo) {
+        if (todo.getAssignedUser().getAuthProvider().equals(AuthProvider.GOOGLE)) {
+            googleTaskService.deleteTask(todo);
+        }
+        todoRepository.deleteById(todo.getId());
     }
 
     @Override
@@ -55,25 +62,6 @@ public class TodoServiceImpl implements TodoService {
     public List<Todo> getAll() {
         Iterable<Todo> allTodos = todoRepository.findAll();
         return IterableUtils.toList(allTodos);
-    }
-
-    @Override
-    public void delete(Todo todo) {
-        if (googleAccessToken != null ) {
-            googleTaskService.deleteTask(todo);
-            googleAccessToken = null;
-        }
-        todoRepository.deleteById(todo.getId());
-    }
-
-    @Override
-    public void setAccessToken(String accessToken) {
-        this.googleAccessToken = accessToken;
-    }
-
-    @Override
-    public String getAccessToken() {
-        return googleAccessToken;
     }
 
     private void validateCreatedDateUnchanged(Todo todo) {

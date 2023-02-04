@@ -1,6 +1,6 @@
 package akletini.life.todo.repository.entity;
 
-import akletini.life.login.repository.entity.User;
+import akletini.life.user.repository.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,9 @@ public class Todo {
     @JoinColumn(name = "TAG_ID", referencedColumnName = "ID")
     private Tag tag;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id")
-    private User user;
+    private User assignedUser;
 
     private File attachedFile;
     @Enumerated(EnumType.STRING)
