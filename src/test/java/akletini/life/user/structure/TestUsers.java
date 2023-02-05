@@ -11,6 +11,7 @@ public class TestUsers {
     public static User getDefaultCredentialUser() {
         User user = new User();
         user.setName("Horst");
+        user.setPassword("Top-Secret");
         user.setLoggedIn(true);
         user.setEmail("horst@horst.de");
         user.setAuthProvider(AuthProvider.CREDENTIALS);

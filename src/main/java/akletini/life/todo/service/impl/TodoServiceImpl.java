@@ -35,7 +35,6 @@ public class TodoServiceImpl implements TodoService {
             if (todo.getAssignedUser().getAuthProvider().equals(AuthProvider.GOOGLE)) {
                 googleTaskService.storeTask(todo);
             }
-
             return todoRepository.save(todo);
         }
         throw new TodoStoreException("Could not store Todo object");
