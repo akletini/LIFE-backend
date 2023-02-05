@@ -28,17 +28,22 @@ public class Todo {
     private String dueAt;
     private String description;
 
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "TAG_ID", referencedColumnName = "ID")
     private Tag tag;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "user_id")
     private User assignedUser;
 
     private File attachedFile;
     @Enumerated(EnumType.STRING)
     private State state;
+
+    @PreRemove
+    private void preRemove() {
+        assignedUser = null;
+    }
 
     @Override
     public boolean equals(Object o) {

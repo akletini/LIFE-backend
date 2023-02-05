@@ -32,7 +32,9 @@ public class Tag implements Serializable {
 
     @PreRemove
     private void preRemove() {
-        assignedTodos.forEach(todo -> todo.setTag(null));
+        if (assignedTodos != null) {
+            assignedTodos.forEach(todo -> todo.setTag(null));
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.GoogleTaskService;
 import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
+import akletini.life.user.service.UserService;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -48,6 +49,9 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private UserService userService;
+
     private static final String CREDENTIAL_PATH = "spring.security.oauth2.client.registration.google";
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -55,7 +59,6 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     private static final String APPLICATION_NAME = "LIFE app";
 
     private static final String TODO_TASK_ID = "c2pXT0NCREp0eFB6ME5HaA";
-
 
     @Override
     public void storeTask(Todo todo) {
@@ -66,6 +69,11 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
                     .setApplicationName(APPLICATION_NAME)
                     .build();
 
+            if (todo.getId() != null) {
+                updateTodo(todo, service);
+                return;
+            }
+
             Task task = new Task();
             task.setTitle(todo.getTitle());
             task.setKind("tasks#task");
@@ -74,19 +82,59 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
 
             service.tasks().insert(TODO_TASK_ID, task).execute();
         } catch (IOException | GeneralSecurityException e) {
-            System.err.println(e.getMessage());
+            throw new RuntimeException(e);
         }
+    }
+
+    private void updateTodo(Todo todo, Tasks service) throws IOException {
+        var tasks = service.tasks().list(TODO_TASK_ID).execute();
+        List<Task> taskList = tasks.getItems();
+        Task currentTask = new Task();
+        for (Task t : taskList) {
+            if (t.getTitle().equals(todo.getTitle())) {
+                currentTask = t;
+                break;
+            }
+        }
+        if (currentTask.isEmpty()) {
+            return;
+        }
+        Task task = service.tasks().get(TODO_TASK_ID, currentTask.getId()).execute();
+        task.setStatus(Todo.State.OPEN.equals(todo.getState()) ? "needsAction" : "completed");
+        task.setNotes(buildDescription(todo));
+        DateTime dateTime = updateDateTime(todo);
+        task.setDue(dateTime.toStringRfc3339());
+        service.tasks().update(TODO_TASK_ID, currentTask.getId(), task).execute();
     }
 
     @Override
     public void deleteTask(Todo todo) {
+        try {
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
+            Tasks service = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(todo, HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+            var tasks = service.tasks().list(TODO_TASK_ID).execute();
+            List<Task> taskList = tasks.getItems();
+            Task currentTask = new Task();
+            for (Task t : taskList) {
+                if (t.getTitle().equals(todo.getTitle())) {
+                    currentTask = t;
+                    break;
+                }
+            }
+            if (currentTask.isEmpty()) {
+                return;
+            }
+
+            service.tasks().delete(TODO_TASK_ID, currentTask.getId()).execute();
+        } catch (IOException |
+                 GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
-    public List<Todo> getAllTasks() {
-        return null;
-    }
 
     @SuppressWarnings("deprecation")
     private Credential getCredentials(Todo todo, HttpTransport transport) {
@@ -104,25 +152,40 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     private String checkTokenValidity(Todo todo) {
         String accessToken;
         User user = todo.getAssignedUser();
+        user = userService.getById(user.getId());
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
-        Date accessTokenCreation = null;
+        TokenContainer tokenContainer = user.getTokenContainer();
+        Date accessTokenCreation;
         try {
-            accessTokenCreation = sdf.parse(user.getTokenContainer().getAccessTokenCreation());
+            accessTokenCreation = sdf.parse(tokenContainer.getAccessTokenCreation());
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        accessTokenCreation = DateUtils.addMinutes(accessTokenCreation, 45);
+        accessTokenCreation = DateUtils.addMinutes(accessTokenCreation, 55);
         Date currentDate = new Date();
 
         if (currentDate.compareTo(accessTokenCreation) >= 0) {
             // Access token expired
             accessToken = fetchNewAccessToken(user);
+            tokenContainer.setAccessTokenCreation(sdf.format(new Date()));
+            tokenContainer.setAccessToken(accessToken);
+            todo.getAssignedUser().setTokenContainer(tokenContainer);
         } else {
             // Access token still valid
-            accessToken = user.getTokenContainer().getAccessToken();
+            accessToken = tokenContainer.getAccessToken();
         }
         return accessToken;
+    }
 
+    private String buildDescription(Todo todo) {
+        String description = "";
+        if (todo.getTag() != null) {
+            description += "TAG: " + todo.getTag().getName() + "\n\n";
+        }
+        if (todo.getDescription() != null) {
+            description += todo.getDescription();
+        }
+        return description;
     }
 
     private String fetchNewAccessToken(User user) {
