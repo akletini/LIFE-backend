@@ -32,7 +32,7 @@ public class TodoServiceImpl implements TodoService {
         if (todo != null) {
             validateCreatedDateUnchanged(todo);
             validateDateFormats(todo);
-            if (todo.getAssignedUser().getAuthProvider().equals(AuthProvider.GOOGLE)) {
+            if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
                 googleTaskService.storeTask(todo);
             }
             return todoRepository.save(todo);

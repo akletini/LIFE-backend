@@ -24,14 +24,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(storedUser));
     }
 
-    @PostMapping("/logout")
-    public void logout() {
-
+    @PutMapping(value = "/update")
+    public ResponseEntity<UserDto> updateTodo(@RequestBody UserDto userDto) {
+        User user = userMapper.dtoToUser(userDto);
+        userService.getById(user.getId());
+        User updatedUser = userService.store(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(updatedUser));
     }
 
     @GetMapping("/getByEmail/{email}")
     public ResponseEntity<UserDto> getByEmail(@PathVariable String email) {
         User user = userService.getByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(user));
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
+        User user = userService.getById(id);
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(user));
     }
 

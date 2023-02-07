@@ -19,6 +19,16 @@ public class TestUsers {
         return user;
     }
 
+    public static User getDefaultGoogleAuthUser() {
+        User user = new User();
+        user.setName("Horst");
+        user.setLoggedIn(true);
+        user.setEmail("horst@gmail.de");
+        user.setAuthProvider(AuthProvider.GOOGLE);
+        user.setTokenContainer(getTokenContainer());
+        return user;
+    }
+
     public static TokenContainer getTokenContainer() {
         TokenContainer tokenContainer = new TokenContainer();
         tokenContainer.setAccessToken("Aaaa");

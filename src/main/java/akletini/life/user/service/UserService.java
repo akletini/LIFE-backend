@@ -6,10 +6,6 @@ public interface UserService {
 
     User store(User user);
 
-    void loginUser(User user);
-
-    void logoutUser(User user);
-
     void deleteUser(User user);
 
     User getById(Long id);
