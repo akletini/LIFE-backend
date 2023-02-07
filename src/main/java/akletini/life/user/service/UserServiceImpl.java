@@ -4,6 +4,7 @@ import akletini.life.user.repository.api.UserRepository;
 import akletini.life.user.repository.entity.AuthProvider;
 import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,39 +31,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void loginUser(User user) {
-
-    }
-
-    @Override
-    public void logoutUser(User user) {
-
-    }
-
-    @Override
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
 
     @Override
     public User getById(Long id) {
-        Optional<User> byEmail = userRepository.findById(id);
-        if (byEmail.isPresent()) {
-            return byEmail.get();
+        Optional<User> userById = userRepository.findById(id);
+        if (userById.isPresent()) {
+            return userById.get();
         }
         throw new RuntimeException("User not found");
     }
 
     @Override
     public User getByEmail(String email) {
-        Optional<User> byEmail = userRepository.findByEmail(email);
-        if (byEmail.isPresent()) {
-            return byEmail.get();
+        Optional<User> userByEmail = userRepository.findByEmail(email);
+        if (userByEmail.isPresent()) {
+            return userByEmail.get();
         }
         throw new RuntimeException("User not found");
     }
 
     private void validateProviders(User user) {
+        if (user.getEmail() == null) {
+            throw new RuntimeException("Missing email, cannot store user");
+        }
         if (AuthProvider.GOOGLE.equals(user.getAuthProvider())) {
             TokenContainer tokenContainer = user.getTokenContainer();
             boolean allNonNull = false;
@@ -74,6 +68,10 @@ public class UserServiceImpl implements UserService {
             }
             if (!allNonNull) {
                 throw new RuntimeException("Not all fields are filled out for" + TokenContainer.class.getName());
+            }
+        } else if (AuthProvider.CREDENTIALS.equals(user.getAuthProvider())) {
+            if (StringUtils.isEmpty(user.getPassword())) {
+                throw new RuntimeException("Missing password, cannot store user");
             }
         }
     }

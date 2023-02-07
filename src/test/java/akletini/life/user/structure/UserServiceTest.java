@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("test")
@@ -26,24 +27,29 @@ public class UserServiceTest {
     @Test
     public void saveUserWithEmptyEmail() {
         // Given
-        User user = TestUsers.getDefaultCredentialUser();
+        User credentialUser = TestUsers.getDefaultCredentialUser();
+        User googleAuthUser = TestUsers.getDefaultGoogleAuthUser();
 
         // When
-        user.setEmail(null);
+        credentialUser.setEmail(null);
+        googleAuthUser.setEmail(null);
 
         // Then
-        assertThrows(Exception.class, () -> userService.store(user));
+        assertThrows(Exception.class, () -> userService.store(credentialUser));
+        assertThrows(Exception.class, () -> userService.store(googleAuthUser));
     }
 
     @Test
     public void saveEmptyPasswordOnCredentials() {
         // Given
-        User user = TestUsers.getDefaultCredentialUser();
+        User credentialUser = TestUsers.getDefaultCredentialUser();
+        User googleAuthUser = TestUsers.getDefaultGoogleAuthUser();
 
         // When
-        user.setPassword(null);
+        credentialUser.setPassword(null);
 
         // Then
-        assertThrows(Exception.class, () -> userService.store(user));
+        assertThrows(Exception.class, () -> userService.store(credentialUser));
+        assertDoesNotThrow(() -> userService.store(googleAuthUser));
     }
 }
