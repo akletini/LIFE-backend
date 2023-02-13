@@ -1,0 +1,20 @@
+version: "3"
+services:
+  backend:
+    image: life-backend
+    ports:
+      - "6969:6969"
+    container_name: life-backend
+    environment:
+      SERVER_IP: 192.168.0.171
+  frontend:
+    build:
+      context: ../LIFE-frontend
+      dockerfile: Dockerfile
+      args:
+        API_BASE_URL: 192.168.0.171:6969
+    image: life-frontend
+    ports:
+      - "3000:3000"
+    container_name: life-frontend
+
