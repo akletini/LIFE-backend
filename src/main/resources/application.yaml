@@ -36,10 +36,10 @@ spring:
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop # update for prod
+      ddl-auto: create-drop
   datasource:
     platform: postgres
-    url: jdbc:postgresql://${SERVER_IP}:54321/postgres
+    url: jdbc:postgresql://localhost:54321/postgres
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
