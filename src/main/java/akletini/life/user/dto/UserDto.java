@@ -13,6 +13,7 @@ public class UserDto {
     private String name;
     private String email;
     private String password;
+    private String imageUrl;
     private boolean loggedIn;
     private AuthProvider authProvider;
     private TokenContainer tokenContainer;

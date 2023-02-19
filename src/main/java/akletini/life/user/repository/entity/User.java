@@ -27,6 +27,8 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+
+    private String imageUrl;
     private boolean loggedIn;
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
