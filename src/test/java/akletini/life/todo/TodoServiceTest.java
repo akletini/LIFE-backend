@@ -23,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collections;
 import java.util.Optional;
 
-import static akletini.life.shared.validation.Errors.CREATED_DATE_UNCHANGED;
+import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
 import static akletini.life.shared.validation.Errors.WRONG_DATE_FORMAT;
 import static akletini.life.todo.structure.TestTodos.getStandardTodo;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
@@ -106,7 +106,7 @@ public class TodoServiceTest {
 
         // Then
         TodoStoreException todoStoreException = assertThrows(TodoStoreException.class, () -> todoService.store(todo));
-        assertEquals(todoStoreException.getMessage(), Errors.getError(WRONG_DATE_FORMAT));
+        assertEquals(todoStoreException.getMessage(), Errors.getError(WRONG_DATE_FORMAT, "createdAt"));
     }
 
     @Test

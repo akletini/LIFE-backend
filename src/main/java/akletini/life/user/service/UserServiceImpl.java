@@ -19,6 +19,11 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
+    public boolean validate(User user) {
+        return false;
+    }
+
+    @Override
     public User store(User user) {
         if (user != null) {
             if (user.getId() == null) {
@@ -31,17 +36,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(User user) {
-        userRepository.delete(user);
-    }
-
-    @Override
     public User getById(Long id) {
         Optional<User> userById = userRepository.findById(id);
         if (userById.isPresent()) {
             return userById.get();
         }
         throw new RuntimeException("User not found");
+    }
+
+    @Override
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override

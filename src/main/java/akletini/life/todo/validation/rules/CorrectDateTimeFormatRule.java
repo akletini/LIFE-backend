@@ -17,7 +17,7 @@ public class CorrectDateTimeFormatRule implements ValidationRule<Todo> {
         try {
             dateTimeFormat.parse(todo.getCreatedAt());
         } catch (ParseException e) {
-            return Optional.of(Errors.getError(Errors.WRONG_DATE_FORMAT, "created at"));
+            return Optional.of(Errors.getError(Errors.WRONG_DATE_FORMAT, "createdAt"));
         }
         return Optional.empty();
     }

@@ -40,4 +40,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
         return sdf.format(date);
     }
+
+    public static String todaysDateAsString() {
+        return new SimpleDateFormat(DATE_FORMAT).format(new Date());
+    }
 }
