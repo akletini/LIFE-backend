@@ -1,5 +1,6 @@
 package akletini.life.todo;
 
+import akletini.life.shared.validation.Errors;
 import akletini.life.todo.exception.custom.TodoStoreException;
 import akletini.life.todo.repository.api.TagRepository;
 import akletini.life.todo.repository.api.TodoRepository;
@@ -22,6 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collections;
 import java.util.Optional;
 
+import static akletini.life.shared.validation.Errors.CREATED_DATE_UNCHANGED;
+import static akletini.life.shared.validation.Errors.WRONG_DATE_FORMAT;
 import static akletini.life.todo.structure.TestTodos.getStandardTodo;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +90,8 @@ public class TodoServiceTest {
 
         // Then
         Todo finalTodo = todo;
-        assertThrows(TodoStoreException.class, () -> todoService.store(finalTodo));
+        TodoStoreException todoStoreException = assertThrows(TodoStoreException.class, () -> todoService.store(finalTodo));
+        assertEquals(todoStoreException.getMessage(), Errors.getError(CREATED_DATE_UNCHANGED));
         assertEquals(initialCreationDate, todoService.getById(todo.getId()).getCreatedAt());
     }
 
@@ -101,7 +105,8 @@ public class TodoServiceTest {
         todo.setCreatedAt(todo.getDueAt());
 
         // Then
-        assertThrows(TodoStoreException.class, () -> todoService.store(todo));
+        TodoStoreException todoStoreException = assertThrows(TodoStoreException.class, () -> todoService.store(todo));
+        assertEquals(todoStoreException.getMessage(), Errors.getError(WRONG_DATE_FORMAT));
     }
 
     @Test

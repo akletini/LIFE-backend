@@ -1,7 +1,8 @@
-package akletini.life.user.structure;
+package akletini.life.user;
 
 import akletini.life.user.repository.entity.User;
 import akletini.life.user.service.UserService;
+import akletini.life.user.structure.TestUsers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
