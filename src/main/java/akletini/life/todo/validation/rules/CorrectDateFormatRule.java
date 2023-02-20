@@ -19,7 +19,7 @@ public class CorrectDateFormatRule implements ValidationRule<Todo> {
         try {
             dateFormat.parse(todo.getDueAt());
         } catch (ParseException e) {
-            return Optional.of(Errors.getError(WRONG_DATE_FORMAT));
+            return Optional.of(Errors.getError(WRONG_DATE_FORMAT, "dueAt"));
         }
         return Optional.empty();
     }

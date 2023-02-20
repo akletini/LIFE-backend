@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 import java.util.Optional;
 
-import static akletini.life.shared.validation.Errors.CREATED_DATE_UNCHANGED;
+import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
 
 @Component
 public class CreatedDateUnchangedRule implements ValidationRule<Todo> {

@@ -1,5 +1,6 @@
 package akletini.life.todo.service.impl;
 
+import akletini.life.shared.validation.Errors;
 import akletini.life.shared.validation.ValidationRule;
 import akletini.life.todo.exception.custom.TodoNotFoundException;
 import akletini.life.todo.exception.custom.TodoStoreException;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
+import static akletini.life.shared.validation.Errors.ENTITY_NOT_FOUND;
+
 @Service
 public class TodoServiceImpl implements TodoService {
 
@@ -27,6 +31,7 @@ public class TodoServiceImpl implements TodoService {
 
     @Autowired
     TodoValidation validation;
+
     @Override
     public boolean validate(Todo todo) {
         List<ValidationRule<Todo>> validationRules = validation.getValidationRules();
@@ -48,7 +53,7 @@ public class TodoServiceImpl implements TodoService {
             }
             return todoRepository.save(todo);
         }
-        throw new TodoStoreException("Could not store Todo object");
+        throw new TodoStoreException(Errors.getError(COULD_NOT_STORE, Todo.class.getSimpleName()));
     }
 
     @Override
@@ -61,11 +66,8 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo getById(Long id) {
-        Optional<Todo> todoById = todoRepository.findById(id);
-        if (todoById.isPresent()) {
-            return todoById.get();
-        }
-        throw new TodoNotFoundException("Could not find Todo with ID " + id);
+        return todoRepository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException(Errors.getError(ENTITY_NOT_FOUND, Todo.class.getSimpleName(), id)));
     }
 
     @Override
