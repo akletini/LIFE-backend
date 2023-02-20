@@ -26,6 +26,7 @@ public class Chore {
     private String startDate;
     private String description;
     private boolean isActive;
+    private boolean shiftInterval;
 
     // duration in minutes;
     private int duration;

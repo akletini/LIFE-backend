@@ -16,6 +16,7 @@ public class ChoreDto {
     private String description;
     private String startDate;
     private boolean isActive;
+    private boolean shiftInterval;
     private int duration;
     private Interval interval;
     private UserDto assignedUser;
