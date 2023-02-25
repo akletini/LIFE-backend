@@ -1,5 +1,6 @@
 package akletini.life.user.repository.entity;
 
+import akletini.life.chore.repository.entity.Chore;
 import akletini.life.todo.repository.entity.Todo;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -37,6 +38,10 @@ public class User {
     @OneToMany(mappedBy = "assignedUser")
     @ToString.Exclude
     private List<Todo> assignedTodos;
+
+    @OneToMany(mappedBy = "assignedUser")
+    @ToString.Exclude
+    private List<Chore> assignedChores;
 
     @Override
     public boolean equals(Object o) {

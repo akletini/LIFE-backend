@@ -4,5 +4,5 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface ValidationRule<T> {
-    Optional<String> validate(final T object);
+    Optional<String> validate(final T validatable);
 }
