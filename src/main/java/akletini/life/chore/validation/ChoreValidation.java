@@ -1,6 +1,7 @@
 package akletini.life.chore.validation;
 
 import akletini.life.chore.repository.entity.Chore;
+import akletini.life.chore.validation.rules.CreatedDateUnchangedRule;
 import akletini.life.chore.validation.rules.PositiveIntervalRule;
 import akletini.life.chore.validation.rules.StartDateNotInPastRule;
 import akletini.life.shared.validation.EntityValidation;
@@ -18,11 +19,14 @@ public class ChoreValidation implements EntityValidation<Chore> {
     private PositiveIntervalRule positiveIntervalRule;
     private StartDateNotInPastRule startDateNotInPastRule;
 
+    private CreatedDateUnchangedRule createdDateUnchangedRule;
+
     @Override
     public List<ValidationRule<Chore>> getValidationRules() {
         final List<ValidationRule<Chore>> validationRules = new ArrayList<>();
         validationRules.add(positiveIntervalRule);
         validationRules.add(startDateNotInPastRule);
+        validationRules.add(createdDateUnchangedRule);
         return validationRules;
     }
 }

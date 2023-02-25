@@ -1,6 +1,6 @@
 package akletini.life.chore;
 
-import akletini.life.chore.exception.ChoreStoreException;
+import akletini.life.chore.exception.custom.ChoreStoreException;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.repository.entity.Interval;
 import akletini.life.chore.service.ChoreService;

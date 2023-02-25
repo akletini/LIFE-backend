@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
 
-@Component
+@Component("todoCreatedDateUnchangedRule")
 public class CreatedDateUnchangedRule implements ValidationRule<Todo> {
     @Autowired
     private TodoRepository todoRepository;

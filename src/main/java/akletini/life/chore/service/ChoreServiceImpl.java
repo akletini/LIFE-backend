@@ -1,7 +1,7 @@
 package akletini.life.chore.service;
 
-import akletini.life.chore.exception.ChoreNotFoundException;
-import akletini.life.chore.exception.ChoreStoreException;
+import akletini.life.chore.exception.custom.ChoreNotFoundException;
+import akletini.life.chore.exception.custom.ChoreStoreException;
 import akletini.life.chore.repository.api.ChoreRepository;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.repository.entity.Interval;
@@ -43,6 +43,7 @@ public class ChoreServiceImpl implements ChoreService {
         } else {
             chore.setDueAt(computeDueDate(chore.getDueAt(), chore.getInterval()));
         }
+        chore = choreRepository.save(chore);
         return chore;
     }
 
