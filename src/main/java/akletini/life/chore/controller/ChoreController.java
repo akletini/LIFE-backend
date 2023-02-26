@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -60,10 +62,12 @@ public class ChoreController {
         return ResponseEntity.status(HttpStatus.OK).body(choreMapper.choreToDto(chore));
     }
 
-    @GetMapping(value = "/get", params = {"page", "size"})
-    public ResponseEntity<HttpResponse> getChores(@RequestParam int page,
-                                                  @RequestParam int size) {
-        Page<Chore> chores = choreService.getChores(page, size);
+    @GetMapping(value = "/get")
+    public ResponseEntity<HttpResponse> getChores(@RequestParam("page") int page,
+                                                  @RequestParam("size") int size,
+                                                  @RequestParam("sortBy") Optional<String> sortBy,
+                                                  @RequestParam Optional<List<String>> filterBy) {
+        Page<Chore> chores = choreService.getChores(page, size, sortBy, filterBy);
         Page<ChoreDto> dtoPage = chores.map(choreMapper::choreToDto);
         return ResponseEntity.ok().body(
                 HttpResponse.builder()

@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -26,10 +27,11 @@ public class Chore {
     @NonNull
     private String title;
     @NonNull
-    private String createdAt;
-    private String dueAt;
+    private Date createdAt;
     @NonNull
-    private String startDate;
+    private Date dueAt;
+    @NonNull
+    private Date startDate;
     private String description;
     private boolean active;
     private boolean shiftInterval;
@@ -40,7 +42,7 @@ public class Chore {
 
     @NonNull
     private Interval interval;
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User assignedUser;
 
