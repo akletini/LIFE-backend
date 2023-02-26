@@ -12,6 +12,7 @@ import akletini.life.shared.validation.ValidationRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -19,7 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static akletini.life.shared.utils.DateUtils.todaysDateAsString;
+import static akletini.life.shared.constants.FilterConstants.ACTIVE;
+import static akletini.life.shared.constants.FilterConstants.DUE;
 
 @Service
 public class ChoreServiceImpl implements ChoreService {
@@ -30,8 +32,18 @@ public class ChoreServiceImpl implements ChoreService {
     ChoreValidation validation;
 
     @Override
-    public Page<Chore> getChores(int page, int pageSize) {
+    public Page<Chore> getChores(int page, int pageSize, Optional<String> sortBy,
+                                 Optional<List<String>> filterBy) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
+        if (sortBy.isPresent()) {
+            pageRequest = PageRequest.of(page, pageSize, Sort.by(sortBy.get()));
+        }
+        if (filterBy.isPresent() && !filterBy.get().isEmpty()) {
+            List<String> filters = filterBy.get();
+            return choreRepository.findFiltered(pageRequest,
+                    filters.contains(ACTIVE),
+                    filters.contains(DUE) ? new Date() : null);
+        }
         return choreRepository.findAll(pageRequest);
     }
 
@@ -39,7 +51,7 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore completeChore(Chore chore) {
         validate(chore);
         if (chore.isShiftInterval()) {
-            chore.setDueAt(computeDueDate(todaysDateAsString(), chore.getInterval()));
+            chore.setDueAt(computeDueDate(new Date(), chore.getInterval()));
         } else {
             chore.setDueAt(computeDueDate(chore.getDueAt(), chore.getInterval()));
         }
@@ -62,7 +74,7 @@ public class ChoreServiceImpl implements ChoreService {
     @Override
     public Chore store(Chore chore) {
         validate(chore);
-        String dueDate = computeDueDate(chore.getStartDate(), chore.getInterval());
+        Date dueDate = computeDueDate(chore.getStartDate(), chore.getInterval());
         chore.setDueAt(dueDate);
         return choreRepository.save(chore);
     }
@@ -77,14 +89,14 @@ public class ChoreServiceImpl implements ChoreService {
         choreRepository.delete(chore);
     }
 
-    private String computeDueDate(String startDate, Interval interval) {
+    private Date computeDueDate(Date startDate, Interval interval) {
         int intervalValue = interval.getValue();
-        Date date = DateUtils.dateStringToDate(startDate);
+        Date date = startDate;
         date = addInterval(interval, intervalValue, date);
         while (DateUtils.truncatedCompareTo(date, new Date(), Calendar.DATE) < 0) {
             date = addInterval(interval, intervalValue, date);
         }
-        return DateUtils.dateToString(date);
+        return date;
     }
 
     private static Date addInterval(Interval interval, int intervalValue, Date date) {

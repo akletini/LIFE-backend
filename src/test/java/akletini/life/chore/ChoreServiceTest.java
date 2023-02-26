@@ -1,6 +1,7 @@
 package akletini.life.chore;
 
 import akletini.life.chore.exception.custom.ChoreStoreException;
+import akletini.life.chore.repository.api.ChoreRepository;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.repository.entity.Interval;
 import akletini.life.chore.service.ChoreService;
@@ -18,16 +19,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
+import java.util.Optional;
 
 import static akletini.life.chore.TestChores.getNewChore;
-import static akletini.life.shared.utils.DateUtils.dateToString;
 import static akletini.life.shared.validation.Errors.CHORE.POSITIVE_INTERVAL;
 import static akletini.life.shared.validation.Errors.CHORE.START_IN_THE_PAST;
 import static akletini.life.shared.validation.Errors.getError;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
 import static org.apache.commons.lang3.time.DateUtils.addDays;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
@@ -43,11 +43,49 @@ public class ChoreServiceTest {
     UserRepository userRepository;
 
     User user;
+    @Autowired
+    private ChoreRepository choreRepository;
 
     @BeforeEach
     public void initDB() {
         user = getDefaultCredentialUser();
         user = userRepository.save(user);
+    }
+
+    @Test
+    public void updateChore() {
+        // GIVEN
+        Chore chore = getNewChore();
+        chore.setDueAt(new Date());
+        chore.setAssignedUser(user);
+        chore = choreRepository.save(chore);
+
+        // WHEN
+        String differentTitle = "a different title";
+        chore.setTitle(differentTitle);
+
+        // THEN
+        Chore finalChore = chore;
+        assertDoesNotThrow(() -> choreService.store(finalChore));
+        Optional<Chore> byId = choreRepository.findById(chore.getId());
+        assertTrue(byId.isPresent() && byId.get().getTitle().equals(differentTitle));
+    }
+
+    @Test
+    public void cannotModifyUser() {
+        // GIVEN
+        Chore chore = getNewChore();
+        chore.setAssignedUser(user);
+        String userEmail = user.getEmail();
+
+        // WHEN
+        chore.getAssignedUser().setEmail("");
+        choreService.store(chore);
+
+        // THEN
+        Optional<User> byId = userRepository.findById(user.getId());
+        assertTrue(byId.isPresent());
+        assertEquals(byId.get().getEmail(), userEmail);
     }
 
     @Test
@@ -58,12 +96,12 @@ public class ChoreServiceTest {
         // the next due date will be shifted
         chore.setShiftInterval(true);
         Date currentDate = new Date();
-        chore.setDueAt(dateToString(currentDate));
+        chore.setDueAt(currentDate);
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, 5);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
@@ -74,12 +112,12 @@ public class ChoreServiceTest {
         // the next due date will be shifted
         chore.setShiftInterval(true);
         Date currentDate = new Date();
-        chore.setDueAt(dateToString(addDays(currentDate, 2)));
+        chore.setDueAt(addDays(currentDate, 2));
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, 5);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
@@ -90,12 +128,12 @@ public class ChoreServiceTest {
         // the next due date will be shifted
         chore.setShiftInterval(true);
         Date currentDate = new Date();
-        chore.setDueAt(dateToString(addDays(currentDate, -2)));
+        chore.setDueAt(addDays(currentDate, -2));
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, 5);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
@@ -104,12 +142,12 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         chore.setShiftInterval(false);
         Date currentDate = new Date();
-        chore.setDueAt(dateToString(currentDate));
+        chore.setDueAt(currentDate);
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, 5);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
@@ -118,12 +156,12 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         chore.setShiftInterval(false);
         Date currentDate = new Date();
-        chore.setDueAt(dateToString(addDays(currentDate, 2)));
+        chore.setDueAt(addDays(currentDate, 2));
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, 7);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
@@ -133,19 +171,19 @@ public class ChoreServiceTest {
         chore.setShiftInterval(false);
         Date currentDate = new Date();
         int delay = -6;
-        chore.setDueAt(dateToString(addDays(currentDate, delay)));
+        chore.setDueAt(addDays(currentDate, delay));
 
         Chore completedChore = choreService.completeChore(chore);
 
         Date targetDate = addDays(currentDate, chore.getInterval().getValue() * 2 + delay);
-        assertEquals(dateToString(targetDate), completedChore.getDueAt());
+        assertEquals(targetDate.toString(), completedChore.getDueAt().toString());
     }
 
     @Test
     public void startDateInThePast() {
         Chore chore = getNewChore();
         chore.setAssignedUser(user);
-        chore.setStartDate(dateToString(addDays(new Date(), -1)));
+        chore.setStartDate(addDays(new Date(), -1));
 
         ChoreStoreException choreStoreException = assertThrows(ChoreStoreException.class, () -> choreService.store(chore));
         assertEquals(choreStoreException.getMessage(), getError(START_IN_THE_PAST));
@@ -155,11 +193,12 @@ public class ChoreServiceTest {
     public void testStartDate() {
         Chore chore = getNewChore();
         chore.setAssignedUser(user);
-        chore.setStartDate(dateToString(addDays(new Date(), 5)));
+        chore.setStartDate(addDays(new Date(), 5));
 
         Chore storedChore = choreService.store(chore);
 
-        assertEquals(dateToString(addDays(new Date(), 5 + chore.getInterval().getValue())), storedChore.getDueAt());
+        assertEquals(addDays(new Date(), 5 + chore.getInterval().getValue()).toString(),
+                storedChore.getDueAt().toString());
     }
 
     @Test
@@ -177,12 +216,12 @@ public class ChoreServiceTest {
         Chore chore = getNewChore();
         chore.setAssignedUser(user);
         Date currentDate = new Date();
-        chore.setStartDate(dateToString(currentDate));
+        chore.setStartDate(currentDate);
         chore.setInterval(new Interval(3, Interval.DateUnit.WEEKS));
 
         Chore storedChore = choreService.store(chore);
 
-        assertEquals(storedChore.getDueAt(), dateToString(DateUtils.addWeeks(currentDate, 3)));
+        assertEquals(storedChore.getDueAt().toString(), DateUtils.addWeeks(currentDate, 3).toString());
     }
 
     @Test
@@ -190,11 +229,11 @@ public class ChoreServiceTest {
         Chore chore = getNewChore();
         chore.setAssignedUser(user);
         Date currentDate = new Date();
-        chore.setStartDate(dateToString(currentDate));
+        chore.setStartDate(currentDate);
         chore.setInterval(new Interval(3, Interval.DateUnit.MONTHS));
 
         Chore storedChore = choreService.store(chore);
 
-        assertEquals(storedChore.getDueAt(), dateToString(DateUtils.addMonths(currentDate, 3)));
+        assertEquals(storedChore.getDueAt().toString(), DateUtils.addMonths(currentDate, 3).toString());
     }
 }
