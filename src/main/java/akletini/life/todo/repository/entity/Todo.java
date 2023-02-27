@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -24,8 +25,9 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
-    private String createdAt;
-    private String dueAt;
+
+    private Date createdAt;
+    private Date dueAt;
     private String description;
 
     @ManyToOne(cascade = {CascadeType.MERGE})

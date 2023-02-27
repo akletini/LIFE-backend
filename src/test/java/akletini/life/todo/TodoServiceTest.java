@@ -1,5 +1,6 @@
 package akletini.life.todo;
 
+import akletini.life.shared.utils.DateUtils;
 import akletini.life.shared.validation.Errors;
 import akletini.life.todo.exception.custom.TodoStoreException;
 import akletini.life.todo.repository.api.TagRepository;
@@ -21,12 +22,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
-import static akletini.life.shared.validation.Errors.WRONG_DATE_FORMAT;
 import static akletini.life.todo.structure.TestTodos.getStandardTodo;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -82,45 +84,19 @@ public class TodoServiceTest {
         // Given
         Todo todo = getStandardTodo();
         todo.setAssignedUser(user);
-        String initialCreationDate = todo.getCreatedAt();
+        Date initialCreationDate = todo.getCreatedAt();
         todo = todoService.store(todo);
 
         // When
-        todo.setCreatedAt("03.02.2023 14:00:00");
+        todo.setCreatedAt(addDays(todo.getCreatedAt(), 3));
 
         // Then
         Todo finalTodo = todo;
-        TodoStoreException todoStoreException = assertThrows(TodoStoreException.class, () -> todoService.store(finalTodo));
+        TodoStoreException todoStoreException = assertThrows(TodoStoreException.class,
+                () -> todoService.store(finalTodo));
         assertEquals(todoStoreException.getMessage(), Errors.getError(CREATED_DATE_UNCHANGED));
-        assertEquals(initialCreationDate, todoService.getById(todo.getId()).getCreatedAt());
-    }
-
-    @Test
-    public void createdAtFormatCorrect() {
-        // Given
-        Todo todo = getStandardTodo();
-        todo.setAssignedUser(user);
-
-        // When
-        todo.setCreatedAt(todo.getDueAt());
-
-        // Then
-        TodoStoreException todoStoreException = assertThrows(TodoStoreException.class, () -> todoService.store(todo));
-        assertEquals(todoStoreException.getMessage(), Errors.getError(WRONG_DATE_FORMAT, "createdAt"));
-    }
-
-    @Test
-    public void dueAtFormatCorrect() {
-        // Given
-        Todo todo = getStandardTodo();
-        todo.setAssignedUser(user);
-        todo.setCreatedAt(todo.getDueAt());
-
-        // When
-        todo.setDueAt(todo.getCreatedAt());
-
-        // Then
-        assertThrows(TodoStoreException.class, () -> todoService.store(todo));
+        assertTrue(DateUtils.isSameInstant(initialCreationDate,
+                todoService.getById(todo.getId()).getCreatedAt()));
     }
 
     @Test

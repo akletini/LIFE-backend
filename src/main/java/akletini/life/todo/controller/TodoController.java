@@ -1,15 +1,20 @@
 package akletini.life.todo.controller;
 
+import akletini.life.shared.response.HttpResponse;
 import akletini.life.todo.dto.TodoDto;
 import akletini.life.todo.dto.mapper.TodoMapper;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.TodoService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -55,5 +60,22 @@ public class TodoController {
     public ResponseEntity<TodoDto> getById(@PathVariable Long id) {
         Todo todoById = todoService.getById(id);
         return ResponseEntity.status(OK).body(todoMapper.todoToDto(todoById));
+    }
+
+    @GetMapping(value = "/get")
+    public ResponseEntity<HttpResponse> getChores(@RequestParam("page") int page,
+                                                  @RequestParam("size") int size,
+                                                  @RequestParam("sortBy") Optional<String> sortBy,
+                                                  @RequestParam Optional<List<String>> filterBy) {
+        Page<Todo> chores = todoService.getTodos(page, size, sortBy, filterBy);
+        Page<TodoDto> dtoPage = chores.map(todoMapper::todoToDto);
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now().toString())
+                        .data(Map.of("page", dtoPage))
+                        .message(OK.getReasonPhrase())
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build());
     }
 }

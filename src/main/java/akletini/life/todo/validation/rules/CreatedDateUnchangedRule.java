@@ -1,5 +1,6 @@
 package akletini.life.todo.validation.rules;
 
+import akletini.life.shared.utils.DateUtils;
 import akletini.life.shared.validation.Errors;
 import akletini.life.shared.validation.ValidationRule;
 import akletini.life.todo.repository.api.TodoRepository;
@@ -7,7 +8,6 @@ import akletini.life.todo.repository.entity.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
@@ -23,7 +23,7 @@ public class CreatedDateUnchangedRule implements ValidationRule<Todo> {
             Optional<Todo> byId = todoRepository.findById(todo.getId());
             if (byId.isPresent()) {
                 Todo loadedTodo = byId.get();
-                if (!Objects.equals(loadedTodo.getCreatedAt(), todo.getCreatedAt())) {
+                if (!DateUtils.isSameInstant(loadedTodo.getCreatedAt(), todo.getCreatedAt())) {
                     return Optional.of(Errors.getError(CREATED_DATE_UNCHANGED));
                 }
             }
