@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static akletini.life.shared.utils.DateUtils.DATE_FORMAT;
 import static akletini.life.shared.utils.DateUtils.DATE_TIME_FORMAT;
 
 @Service
@@ -223,17 +222,13 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     }
 
     private DateTime updateDateTime(Todo todo) {
-        DateTime dateTime = null;
-        try {
-            Date date = new SimpleDateFormat(DATE_FORMAT).parse(todo.getDueAt());
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            c.add(Calendar.HOUR, 12);
-            date = c.getTime();
-            dateTime = new DateTime(date);
-        } catch (ParseException e) {
-            System.out.println("Invalid date format");
-        }
-        return dateTime != null ? dateTime : new DateTime(todo.getDueAt());
+        DateTime dateTime;
+        Date date = todo.getDueAt();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.HOUR, 12);
+        date = c.getTime();
+        dateTime = new DateTime(date);
+        return dateTime;
     }
 }

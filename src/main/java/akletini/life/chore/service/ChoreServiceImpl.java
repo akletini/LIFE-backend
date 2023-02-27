@@ -9,6 +9,7 @@ import akletini.life.chore.validation.ChoreValidation;
 import akletini.life.shared.utils.DateUtils;
 import akletini.life.shared.validation.Errors;
 import akletini.life.shared.validation.ValidationRule;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +23,10 @@ import java.util.Optional;
 
 import static akletini.life.shared.constants.FilterConstants.ACTIVE;
 import static akletini.life.shared.constants.FilterConstants.DUE;
+import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
 
 @Service
+@Log4j2
 public class ChoreServiceImpl implements ChoreService {
     @Autowired
     private ChoreRepository choreRepository;
@@ -65,7 +68,9 @@ public class ChoreServiceImpl implements ChoreService {
         validationRules.forEach(rule -> {
             Optional<String> error = rule.validate(chore);
             if (error.isPresent()) {
-                throw new ChoreStoreException(error.get());
+                ChoreStoreException exception = new ChoreStoreException(error.get());
+                log.error(exception.getStackTrace());
+                throw exception;
             }
         });
         return true;
@@ -73,19 +78,34 @@ public class ChoreServiceImpl implements ChoreService {
 
     @Override
     public Chore store(Chore chore) {
-        validate(chore);
-        Date dueDate = computeDueDate(chore.getStartDate(), chore.getInterval());
-        chore.setDueAt(dueDate);
-        return choreRepository.save(chore);
+        if (chore != null) {
+            validate(chore);
+            Date dueDate = computeDueDate(chore.getStartDate(), chore.getInterval());
+            chore.setDueAt(dueDate);
+            return choreRepository.save(chore);
+        }
+        ChoreStoreException choreStoreException =
+                new ChoreStoreException(Errors.getError(COULD_NOT_STORE,
+                        Chore.class.getSimpleName()));
+        log.error(choreStoreException.getStackTrace());
+        throw choreStoreException;
     }
 
     @Override
     public Chore getById(Long id) {
-        return choreRepository.findById(id).orElseThrow(() -> new ChoreNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND, Chore.class.getSimpleName(), id)));
+        log.info("Searching chore with id {}", id);
+        return choreRepository.findById(id).orElseThrow(() -> {
+            ChoreNotFoundException exception =
+                    new ChoreNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
+                            Chore.class.getSimpleName(), id));
+            log.error(exception);
+            return exception;
+        });
     }
 
     @Override
     public void delete(Chore chore) {
+        log.info("Deleting chore with id {}", chore.getId());
         choreRepository.delete(chore);
     }
 

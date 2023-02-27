@@ -6,4 +6,8 @@ public interface FilterConstants {
     String ACTIVE = "active";
 
     String COMPLETED = "completed";
+
+    String OPEN = "open";
+
+    String DONE = "done";
 }
