@@ -11,13 +11,13 @@ import akletini.life.todo.service.api.TodoService;
 import akletini.life.todo.validation.TodoValidation;
 import akletini.life.user.repository.entity.AuthProvider;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +58,7 @@ public class TodoServiceImpl implements TodoService {
         if (todo != null) {
             validate(todo);
             if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
-                googleTaskService.storeTask(todo);
+//                googleTaskService.storeTask(todo);
             }
             return todoRepository.save(todo);
         }
@@ -90,24 +90,20 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<Todo> getAll() {
-        Iterable<Todo> allTodos = todoRepository.findAll();
-        return IterableUtils.toList(allTodos);
-    }
-
-    @Override
     public Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
-                               Optional<List<String>> filterBy) {
+                               Optional<List<String>> filterBy, Optional<List<String>> tags) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         if (sortBy.isPresent()) {
             pageRequest = PageRequest.of(page, pageSize, Sort.by(sortBy.get()));
         }
-        if (filterBy.isPresent() && !filterBy.get().isEmpty()) {
-            List<String> filters = filterBy.get();
+        if (filterBy.isPresent() && !filterBy.get().isEmpty()
+                || tags.isPresent() && !tags.get().isEmpty()) {
+            List<String> filters = filterBy.orElse(new ArrayList<>());
             return todoRepository.findFiltered(pageRequest,
-                    filters.contains(OPEN) ? Todo.State.OPEN.toString() : null,
+                    filters.contains(OPEN) ? Todo.State.OPEN : null,
                     filters.contains(DUE) ? new Date() : null,
-                    filters.contains(DONE) ? Todo.State.DONE.toString() : null);
+                    filters.contains(DONE) ? Todo.State.DONE : null,
+                    tags.orElse(null));
         }
         return todoRepository.findAll(pageRequest);
     }

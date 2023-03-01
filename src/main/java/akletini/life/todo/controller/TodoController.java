@@ -49,13 +49,6 @@ public class TodoController {
         return ResponseEntity.status(OK).build();
     }
 
-    @GetMapping(value = "/getAll")
-    public ResponseEntity<List<TodoDto>> getAllTodos() {
-        List<Todo> allTodos = todoService.getAll();
-        List<TodoDto> allToDto = allTodos.stream().map(todoMapper::todoToDto).toList();
-        return ResponseEntity.status(OK).body(allToDto);
-    }
-
     @GetMapping(value = "/get/{id}")
     public ResponseEntity<TodoDto> getById(@PathVariable Long id) {
         Todo todoById = todoService.getById(id);
@@ -66,9 +59,10 @@ public class TodoController {
     public ResponseEntity<HttpResponse> getChores(@RequestParam("page") int page,
                                                   @RequestParam("size") int size,
                                                   @RequestParam("sortBy") Optional<String> sortBy,
-                                                  @RequestParam Optional<List<String>> filterBy) {
-        Page<Todo> chores = todoService.getTodos(page, size, sortBy, filterBy);
-        Page<TodoDto> dtoPage = chores.map(todoMapper::todoToDto);
+                                                  @RequestParam ("filterBy") Optional<List<String>> filterBy,
+                                                  @RequestParam("tags") Optional<List<String>> tags) {
+        Page<Todo> todos = todoService.getTodos(page, size, sortBy, filterBy, tags);
+        Page<TodoDto> dtoPage = todos.map(todoMapper::todoToDto);
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
                         .timeStamp(LocalDateTime.now().toString())

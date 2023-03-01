@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 import static akletini.life.shared.constants.FilterConstants.*;
 
@@ -20,9 +21,10 @@ public interface TodoRepository extends CrudRepository<Todo, Long>,
     @Query(value = """
             SELECT t FROM Todo t WHERE
             (:open is null or t.state=:open) and
-            (cast(:dueAt as date) is null or t.dueAt>=:dueAt) and
-            (:done is null or t.state=:done)
+            (cast(:due as date) is null or t.dueAt>=:due) and
+            (:done is null or t.state=:done) and
+            (coalesce(:tags, null) is null or t.tag.name IN :tags)
             """)
-    Page<Todo> findFiltered(Pageable pageable, @Param(OPEN) String open,
-                            @Param(DUE) Date due, @Param(DONE) String done);
+    Page<Todo> findFiltered(Pageable pageable, @Param(OPEN) Todo.State open,
+                            @Param(DUE) Date due, @Param(DONE) Todo.State done, @Param("tags") List<String> tags);
 }
