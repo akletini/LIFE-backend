@@ -70,7 +70,7 @@ public class ChoreRepositoryTest {
         final int[] counter = {0};
         testChores.forEach(chore -> {
             if (counter[0] < 5) {
-                chore.setDueAt(addDays(chore.getDueAt(), -5));
+                chore.setDueAt(addDays(chore.getDueAt(), 5));
                 choreRepository.save(chore);
             }
             counter[0]++;
@@ -83,7 +83,7 @@ public class ChoreRepositoryTest {
         // THEN
         assertEquals(5, foundChores.size());
         List<Chore> filteredChores =
-                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) <= 0).toList();
+                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) >= 0).toList();
         assertTrue(filteredChores.isEmpty());
     }
 
@@ -96,7 +96,7 @@ public class ChoreRepositoryTest {
         final int[] counter = {0};
         testChores.forEach(chore -> {
             if (counter[0] < 5) {
-                chore.setDueAt(addDays(chore.getDueAt(), -5));
+                chore.setDueAt(addDays(chore.getDueAt(), 5));
                 choreRepository.save(chore);
             }
             counter[0]++;
@@ -110,7 +110,7 @@ public class ChoreRepositoryTest {
         // THEN
         assertEquals(10, foundChores.size());
         List<Chore> filteredChores =
-                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) <= 0).toList();
+                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) >= 0).toList();
         assertTrue(filteredChores.isEmpty());
         List<Boolean> activeStates = foundChores.stream().map(Chore::isActive).toList();
         assertFalse(activeStates.contains(false));
@@ -131,7 +131,7 @@ public class ChoreRepositoryTest {
         for (int i = 0; i < count; i++) {
             Chore chore = getNewChore();
             chore.setAssignedUser(user);
-            chore.setDueAt(addDays(new Date(), 3));
+            chore.setDueAt(addDays(new Date(), -3));
             chores.add(choreRepository.save(chore));
         }
         return chores;

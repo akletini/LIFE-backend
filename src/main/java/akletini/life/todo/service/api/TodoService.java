@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface TodoService extends EntityService<Todo> {
 
     Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
-                        Optional<List<String>> filterBy, Optional<List<String>> tags);
+                        Optional<List<String>> filterBy, Optional<List<Long>> tags);
 
 }

@@ -60,7 +60,7 @@ public class TodoController {
                                                   @RequestParam("size") int size,
                                                   @RequestParam("sortBy") Optional<String> sortBy,
                                                   @RequestParam ("filterBy") Optional<List<String>> filterBy,
-                                                  @RequestParam("tags") Optional<List<String>> tags) {
+                                                  @RequestParam("tags") Optional<List<Long>> tags) {
         Page<Todo> todos = todoService.getTodos(page, size, sortBy, filterBy, tags);
         Page<TodoDto> dtoPage = todos.map(todoMapper::todoToDto);
         return ResponseEntity.ok().body(

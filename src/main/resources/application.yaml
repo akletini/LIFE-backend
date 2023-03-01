@@ -14,6 +14,9 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
   datasource:
     platform: postgres
     url: jdbc:postgresql://${SERVER_IP}:5432/postgres
@@ -37,10 +40,18 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
   datasource:
     platform: postgres
     url: jdbc:postgresql://localhost:54321/postgres
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
+logging:
+  level:
+    org:
+      hibernate:
+        type: trace
 name: test-yaml

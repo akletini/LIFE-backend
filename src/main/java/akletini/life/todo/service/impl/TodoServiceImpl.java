@@ -58,7 +58,7 @@ public class TodoServiceImpl implements TodoService {
         if (todo != null) {
             validate(todo);
             if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
-//                googleTaskService.storeTask(todo);
+                googleTaskService.storeTask(todo);
             }
             return todoRepository.save(todo);
         }
@@ -91,7 +91,7 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
-                               Optional<List<String>> filterBy, Optional<List<String>> tags) {
+                               Optional<List<String>> filterBy, Optional<List<Long>> tags) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         if (sortBy.isPresent()) {
             pageRequest = PageRequest.of(page, pageSize, Sort.by(sortBy.get()));
