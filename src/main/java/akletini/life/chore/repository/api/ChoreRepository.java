@@ -16,7 +16,7 @@ public interface ChoreRepository extends CrudRepository<Chore, Long>,
     @Query(value = """
             SELECT c FROM Chore c WHERE
              (:active is null or c.active=:active) and
-             (cast(:dueAt as date) is null or c.dueAt>=:dueAt)""")
+             (cast(:dueAt as date) is null or c.dueAt<=:dueAt)""")
     Page<Chore> findFiltered(Pageable pageable, @Param("active") Boolean isActive,
                              @Param("dueAt") Date dueAt);
 
