@@ -80,7 +80,7 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore store(Chore chore) {
         if (chore != null) {
             validate(chore);
-            Date dueDate = computeDueDate(chore.getStartDate(), chore.getInterval());
+            Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getStartDate(), chore.getInterval()) : chore.getStartDate();
             chore.setDueAt(dueDate);
             return choreRepository.save(chore);
         }

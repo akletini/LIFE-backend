@@ -197,7 +197,7 @@ public class ChoreServiceTest {
 
         Chore storedChore = choreService.store(chore);
 
-        assertEquals(addDays(new Date(), 5 + chore.getInterval().getValue()).toString(),
+        assertEquals(addDays(new Date(), 5).toString(),
                 storedChore.getDueAt().toString());
     }
 
@@ -217,6 +217,8 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         Date currentDate = new Date();
         chore.setStartDate(currentDate);
+        chore.setDueAt(addDays(new Date(), -3));
+        chore.setShiftInterval(true);
         chore.setInterval(new Interval(3, Interval.DateUnit.WEEKS));
 
         Chore storedChore = choreService.store(chore);
@@ -230,6 +232,8 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         Date currentDate = new Date();
         chore.setStartDate(currentDate);
+        chore.setDueAt(addDays(currentDate, -3));
+        chore.setShiftInterval(true);
         chore.setInterval(new Interval(3, Interval.DateUnit.MONTHS));
 
         Chore storedChore = choreService.store(chore);
