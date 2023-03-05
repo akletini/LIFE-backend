@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static akletini.life.shared.utils.DateUtils.localDateTimeToDate;
 import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
 
 @Component("todoCreatedDateUnchangedRule")
@@ -23,7 +24,8 @@ public class CreatedDateUnchangedRule implements ValidationRule<Todo> {
             Optional<Todo> byId = todoRepository.findById(todo.getId());
             if (byId.isPresent()) {
                 Todo loadedTodo = byId.get();
-                if (!DateUtils.isSameInstant(loadedTodo.getCreatedAt(), todo.getCreatedAt())) {
+                if (!DateUtils.isSameInstant(localDateTimeToDate(loadedTodo.getCreatedAt()),
+                        localDateTimeToDate(todo.getCreatedAt()))) {
                     return Optional.of(Errors.getError(CREATED_DATE_UNCHANGED));
                 }
             }

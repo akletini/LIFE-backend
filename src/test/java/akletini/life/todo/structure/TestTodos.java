@@ -3,8 +3,9 @@ package akletini.life.todo.structure;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.repository.entity.Todo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static akletini.life.shared.utils.DateUtils.DATE_FORMAT;
 import static akletini.life.shared.utils.DateUtils.DATE_TIME_FORMAT;
@@ -17,13 +18,8 @@ public class TestTodos {
         todo.setTitle("TestTodo");
         todo.setDescription("This is a description");
         todo.setState(Todo.State.OPEN);
-        try {
-            todo.setCreatedAt(new SimpleDateFormat(DATE_TIME_FORMAT)
-                    .parse("01.02.2023 14:00:00"));
-            todo.setDueAt(new SimpleDateFormat(DATE_FORMAT).parse("02.02.2023"));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        todo.setCreatedAt(LocalDateTime.parse("01.02.2023 14:00:00", DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
+        todo.setDueAt(LocalDate.parse("02.02.2023", DateTimeFormatter.ofPattern(DATE_FORMAT)));
         todo.setAssignedUser(getDefaultCredentialUser());
         return todo;
     }
@@ -33,13 +29,8 @@ public class TestTodos {
         todo.setTitle("TestTodo");
         todo.setDescription("This is a description");
         todo.setState(Todo.State.OPEN);
-        try {
-            todo.setCreatedAt(new SimpleDateFormat(DATE_TIME_FORMAT)
-                    .parse("01.02.2023 14:00:00"));
-            todo.setDueAt(new SimpleDateFormat(DATE_FORMAT).parse("02.02.2023"));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        todo.setCreatedAt(LocalDateTime.parse("01.02.2023 14:00:00", DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
+        todo.setDueAt(LocalDate.parse("02.02.2023", DateTimeFormatter.ofPattern(DATE_FORMAT)));
         todo.setTag(getUniTag());
         return todo;
     }

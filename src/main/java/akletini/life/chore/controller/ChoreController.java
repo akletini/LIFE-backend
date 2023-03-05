@@ -4,6 +4,7 @@ import akletini.life.chore.dto.ChoreDto;
 import akletini.life.chore.dto.mapper.ChoreMapper;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.service.ChoreService;
+import akletini.life.mail.MailService;
 import akletini.life.shared.response.HttpResponse;
 import akletini.life.todo.dto.TodoDto;
 import org.mapstruct.factory.Mappers;
@@ -77,5 +78,13 @@ public class ChoreController {
                         .status(OK)
                         .statusCode(OK.value())
                         .build());
+    }
+
+    @Autowired
+    private MailService mailService;
+
+    @GetMapping("/mail")
+    public void mail() {
+        mailService.sendMail();
     }
 }
