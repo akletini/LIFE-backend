@@ -1,7 +1,12 @@
 package akletini.life.shared.utils;
 
+import akletini.life.chore.repository.entity.Interval;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
@@ -11,6 +16,33 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     private DateUtils() {
 
+    }
+
+    public static Date localDateToDate(LocalDate date) {
+        return Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date localDateTimeToDate(LocalDateTime date) {
+        return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static LocalDate dateToLocalDate(Date date) {
+        return LocalDate.ofInstant(
+                date.toInstant(), ZoneId.systemDefault());
+    }
+
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(
+                date.toInstant(), ZoneId.systemDefault());
+    }
+
+    public static Date addInterval(Interval interval, int intervalValue, Date date) {
+        switch (interval.getUnit()) {
+            case DAYS -> date = DateUtils.addDays(date, intervalValue);
+            case WEEKS -> date = DateUtils.addWeeks(date, intervalValue);
+            case MONTHS -> date = DateUtils.addMonths(date, intervalValue);
+        }
+        return date;
     }
 
     public static Date dateStringToDate(String date) {

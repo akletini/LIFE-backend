@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public interface ChoreRepository extends CrudRepository<Chore, Long>,
         PagingAndSortingRepository<Chore, Long> {
@@ -18,6 +18,6 @@ public interface ChoreRepository extends CrudRepository<Chore, Long>,
              (:active is null or c.active=:active) and
              (cast(:dueAt as date) is null or c.dueAt<=:dueAt)""")
     Page<Chore> findFiltered(Pageable pageable, @Param("active") Boolean isActive,
-                             @Param("dueAt") Date dueAt);
+                             @Param("dueAt") LocalDate dueAt);
 
 }

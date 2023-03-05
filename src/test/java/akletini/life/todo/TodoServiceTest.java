@@ -21,10 +21,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Optional;
 
+import static akletini.life.shared.utils.DateUtils.dateToLocalDateTime;
+import static akletini.life.shared.utils.DateUtils.localDateTimeToDate;
 import static akletini.life.shared.validation.Errors.TODO.CREATED_DATE_UNCHANGED;
 import static akletini.life.todo.structure.TestTodos.getStandardTodo;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
@@ -84,19 +86,19 @@ public class TodoServiceTest {
         // Given
         Todo todo = getStandardTodo();
         todo.setAssignedUser(user);
-        Date initialCreationDate = todo.getCreatedAt();
+        LocalDateTime initialCreationDate = todo.getCreatedAt();
         todo = todoService.store(todo);
 
         // When
-        todo.setCreatedAt(addDays(todo.getCreatedAt(), 3));
+        todo.setCreatedAt(dateToLocalDateTime(addDays(localDateTimeToDate(todo.getCreatedAt()), 3)));
 
         // Then
         Todo finalTodo = todo;
         TodoStoreException todoStoreException = assertThrows(TodoStoreException.class,
                 () -> todoService.store(finalTodo));
         assertEquals(todoStoreException.getMessage(), Errors.getError(CREATED_DATE_UNCHANGED));
-        assertTrue(DateUtils.isSameInstant(initialCreationDate,
-                todoService.getById(todo.getId()).getCreatedAt()));
+        assertTrue(DateUtils.isSameInstant(localDateTimeToDate(initialCreationDate),
+                localDateTimeToDate(todoService.getById(todo.getId()).getCreatedAt())));
     }
 
     @Test

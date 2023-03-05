@@ -9,7 +9,8 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -27,11 +28,11 @@ public class Chore {
     @NonNull
     private String title;
     @NonNull
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @NonNull
-    private Date dueAt;
+    private LocalDate dueAt;
     @NonNull
-    private Date startDate;
+    private LocalDate startDate;
     private String description;
     private boolean active;
     private boolean shiftInterval;

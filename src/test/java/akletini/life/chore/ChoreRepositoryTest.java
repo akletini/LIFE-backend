@@ -17,12 +17,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static akletini.life.chore.TestChores.getNewChore;
+import static akletini.life.shared.utils.DateUtils.dateToLocalDate;
+import static akletini.life.shared.utils.DateUtils.localDateToDate;
 import static akletini.life.user.structure.TestUsers.getDefaultCredentialUser;
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +73,7 @@ public class ChoreRepositoryTest {
         final int[] counter = {0};
         testChores.forEach(chore -> {
             if (counter[0] < 5) {
-                chore.setDueAt(addDays(chore.getDueAt(), 5));
+                chore.setDueAt(dateToLocalDate(addDays(localDateToDate(chore.getDueAt()), 5)));
                 choreRepository.save(chore);
             }
             counter[0]++;
@@ -78,12 +81,12 @@ public class ChoreRepositoryTest {
 
         // WHEN
         List<Chore> foundChores =
-                choreRepository.findFiltered(PageRequest.of(0, 5), null, new Date()).toList();
+                choreRepository.findFiltered(PageRequest.of(0, 5), null, LocalDate.now()).toList();
 
         // THEN
         assertEquals(5, foundChores.size());
         List<Chore> filteredChores =
-                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) >= 0).toList();
+                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(localDateToDate(chore.getDueAt()), new Date(), Calendar.DATE) >= 0).toList();
         assertTrue(filteredChores.isEmpty());
     }
 
@@ -96,7 +99,7 @@ public class ChoreRepositoryTest {
         final int[] counter = {0};
         testChores.forEach(chore -> {
             if (counter[0] < 5) {
-                chore.setDueAt(addDays(chore.getDueAt(), 5));
+                chore.setDueAt(dateToLocalDate(addDays(localDateToDate(chore.getDueAt()), 5)));
                 choreRepository.save(chore);
             }
             counter[0]++;
@@ -105,12 +108,12 @@ public class ChoreRepositoryTest {
 
         // WHEN
         List<Chore> foundChores =
-                choreRepository.findFiltered(PageRequest.of(0, 50), true, new Date()).toList();
+                choreRepository.findFiltered(PageRequest.of(0, 50), true, LocalDate.now()).toList();
 
         // THEN
         assertEquals(10, foundChores.size());
         List<Chore> filteredChores =
-                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(chore.getDueAt(), new Date(), Calendar.DATE) >= 0).toList();
+                foundChores.stream().filter(chore -> DateUtils.truncatedCompareTo(localDateToDate(chore.getDueAt()), new Date(), Calendar.DATE) >= 0).toList();
         assertTrue(filteredChores.isEmpty());
         List<Boolean> activeStates = foundChores.stream().map(Chore::isActive).toList();
         assertFalse(activeStates.contains(false));
@@ -131,7 +134,7 @@ public class ChoreRepositoryTest {
         for (int i = 0; i < count; i++) {
             Chore chore = getNewChore();
             chore.setAssignedUser(user);
-            chore.setDueAt(addDays(new Date(), -3));
+            chore.setDueAt(dateToLocalDate(addDays(new Date(), -3)));
             chores.add(choreRepository.save(chore));
         }
         return chores;

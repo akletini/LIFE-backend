@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static akletini.life.shared.constants.FilterConstants.ACTIVE;
 import static akletini.life.shared.constants.FilterConstants.DUE;
+import static akletini.life.shared.utils.DateUtils.*;
 import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
 
 @Service
@@ -45,7 +47,7 @@ public class ChoreServiceImpl implements ChoreService {
             List<String> filters = filterBy.get();
             return choreRepository.findFiltered(pageRequest,
                     filters.contains(ACTIVE),
-                    filters.contains(DUE) ? new Date() : null);
+                    filters.contains(DUE) ? LocalDate.now() : null);
         }
         return choreRepository.findAll(pageRequest);
     }
@@ -54,9 +56,9 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore completeChore(Chore chore) {
         validate(chore);
         if (chore.isShiftInterval()) {
-            chore.setDueAt(computeDueDate(new Date(), chore.getInterval()));
+            chore.setDueAt(dateToLocalDate(computeDueDate(new Date(), chore.getInterval())));
         } else {
-            chore.setDueAt(computeDueDate(chore.getDueAt(), chore.getInterval()));
+            chore.setDueAt(dateToLocalDate(computeDueDate(localDateToDate(chore.getDueAt()), chore.getInterval())));
         }
         chore = choreRepository.save(chore);
         return chore;
@@ -69,7 +71,7 @@ public class ChoreServiceImpl implements ChoreService {
             Optional<String> error = rule.validate(chore);
             if (error.isPresent()) {
                 ChoreStoreException exception = new ChoreStoreException(error.get());
-                log.error(exception.getStackTrace());
+                log.error(exception);
                 throw exception;
             }
         });
@@ -80,14 +82,14 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore store(Chore chore) {
         if (chore != null) {
             validate(chore);
-            Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getStartDate(), chore.getInterval()) : chore.getStartDate();
-            chore.setDueAt(dueDate);
+            Date dueDate = chore.getDueAt() != null ? computeDueDate(localDateToDate(chore.getStartDate()), chore.getInterval()) : localDateToDate(chore.getStartDate());
+            chore.setDueAt(dateToLocalDate(dueDate));
             return choreRepository.save(chore);
         }
         ChoreStoreException choreStoreException =
                 new ChoreStoreException(Errors.getError(COULD_NOT_STORE,
                         Chore.class.getSimpleName()));
-        log.error(choreStoreException.getStackTrace());
+        log.error(choreStoreException);
         throw choreStoreException;
     }
 
@@ -119,12 +121,4 @@ public class ChoreServiceImpl implements ChoreService {
         return date;
     }
 
-    private static Date addInterval(Interval interval, int intervalValue, Date date) {
-        switch (interval.getUnit()) {
-            case DAYS -> date = DateUtils.addDays(date, intervalValue);
-            case WEEKS -> date = DateUtils.addWeeks(date, intervalValue);
-            case MONTHS -> date = DateUtils.addMonths(date, intervalValue);
-        }
-        return date;
-    }
 }

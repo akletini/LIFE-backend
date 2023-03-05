@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 import static akletini.life.shared.utils.DateUtils.DATE_TIME_FORMAT;
+import static akletini.life.shared.utils.DateUtils.localDateToDate;
 
 @Service
 public class GoogleTaskServiceImpl implements GoogleTaskService {
@@ -223,7 +224,7 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
 
     private DateTime updateDateTime(Todo todo) {
         DateTime dateTime;
-        Date date = todo.getDueAt();
+        Date date = localDateToDate(todo.getDueAt());
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         c.add(Calendar.HOUR, 12);
