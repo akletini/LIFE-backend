@@ -6,6 +6,7 @@ import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,15 +26,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User store(User user) {
-        if (user != null) {
-            if (user.getId() == null) {
-                validateProviders(user);
-                user.setLoggedIn(true);
-            }
-            return userRepository.save(user);
+    public User store(@NonNull User user) {
+        if (user.getId() == null) {
+            validateProviders(user);
+            user.setLoggedIn(true);
         }
-        throw new RuntimeException(String.format("Could not store %s object", User.class.getName()));
+        return userRepository.save(user);
     }
 
     @Override

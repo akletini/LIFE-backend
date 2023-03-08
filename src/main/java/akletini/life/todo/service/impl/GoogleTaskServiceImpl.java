@@ -2,6 +2,7 @@ package akletini.life.todo.service.impl;
 
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.GoogleTaskService;
+import akletini.life.todo.service.api.TodoService;
 import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
 import akletini.life.user.service.UserService;
@@ -15,6 +16,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpEntity;
@@ -28,6 +30,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +48,7 @@ import static akletini.life.shared.utils.DateUtils.DATE_TIME_FORMAT;
 import static akletini.life.shared.utils.DateUtils.localDateToDate;
 
 @Service
+@Log4j2
 public class GoogleTaskServiceImpl implements GoogleTaskService {
 
     @Autowired
@@ -52,6 +56,10 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    @Lazy
+    private TodoService todoService;
 
     private static final String CREDENTIAL_PATH = "spring.security.oauth2.client.registration.google";
 
@@ -71,9 +79,11 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
                     .build();
 
             if (todo.getId() != null) {
+                log.info("Updating Google task with id: {}", todo.getId());
                 updateTodo(todo, service);
                 return;
             }
+            log.info("Creating Google task {}", todo.getTitle());
 
             Task task = new Task();
             task.setTitle(todo.getTitle());
@@ -91,16 +101,19 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
         var tasks = service.tasks().list(TODO_TASK_ID).execute();
         List<Task> taskList = tasks.getItems();
         Task currentTask = new Task();
+        Todo todoFromDB = todoService.getById(todo.getId());
         for (Task t : taskList) {
-            if (t.getTitle().equals(todo.getTitle())) {
+            if (t.getTitle().equals(todoFromDB.getTitle())) {
                 currentTask = t;
                 break;
             }
         }
         if (currentTask.isEmpty()) {
+            log.error("Could not find todo with id: {}", todo.getId());
             return;
         }
         Task task = service.tasks().get(TODO_TASK_ID, currentTask.getId()).execute();
+        task.setTitle(todo.getTitle());
         task.setStatus(Todo.State.OPEN.equals(todo.getState()) ? "needsAction" : "completed");
         task.setNotes(buildDescription(todo));
         DateTime dateTime = updateDateTime(todo);
@@ -139,7 +152,14 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
 
     @SuppressWarnings("deprecation")
     private Credential getCredentials(Todo todo, HttpTransport transport) {
-        String accessToken = checkTokenValidity(todo);
+        String accessToken;
+        try {
+            accessToken = checkTokenValidity(todo);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+
         todo.getAssignedUser().getTokenContainer().setAccessToken(accessToken);
         Credential credential = new GoogleCredential.Builder()
                 .setClientSecrets(env.getProperty(CREDENTIAL_PATH + ".client-id"), env.getProperty(CREDENTIAL_PATH + ".client-secret"))
