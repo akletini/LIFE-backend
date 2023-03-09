@@ -33,6 +33,8 @@ public class Chore {
     private LocalDate dueAt;
     @NonNull
     private LocalDate startDate;
+
+    private LocalDate lastCompleted;
     private String description;
     private boolean active;
     private boolean shiftInterval;

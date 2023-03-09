@@ -17,6 +17,9 @@ public class StartDateNotInPastRule implements ValidationRule<Chore> {
 
     @Override
     public Optional<String> validate(Chore chore) {
+        if (chore.getId() != null) {
+            return Optional.empty();
+        }
         Date startDate = localDateToDate(chore.getStartDate());
         if (DateUtils.truncatedCompareTo(startDate, new Date(), Calendar.DATE) < 0) {
             return Optional.of(Errors.getError(Errors.CHORE.START_IN_THE_PAST));

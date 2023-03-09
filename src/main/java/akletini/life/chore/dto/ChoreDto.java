@@ -15,6 +15,7 @@ public class ChoreDto {
     private String dueAt;
     private String description;
     private String startDate;
+    private String lastCompleted;
     private boolean active;
     private boolean shiftInterval;
     private int duration;

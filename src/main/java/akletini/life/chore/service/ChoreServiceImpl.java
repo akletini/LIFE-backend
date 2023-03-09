@@ -60,6 +60,7 @@ public class ChoreServiceImpl implements ChoreService {
         } else {
             chore.setDueAt(dateToLocalDate(computeDueDate(localDateToDate(chore.getDueAt()), chore.getInterval())));
         }
+        chore.setLastCompleted(LocalDate.now());
         chore = choreRepository.save(chore);
         return chore;
     }

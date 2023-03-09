@@ -17,11 +17,13 @@ public interface ChoreMapper {
     @Mapping(target = "createdAt", dateFormat = DATE_TIME_FORMAT)
     @Mapping(target = "dueAt", dateFormat = DATE_FORMAT)
     @Mapping(target = "startDate", dateFormat = DATE_FORMAT)
+    @Mapping(target = "lastCompleted", dateFormat = DATE_FORMAT)
     Chore dtoToChore(ChoreDto choreDto);
 
     @Mapping(target = "createdAt", dateFormat = DATE_TIME_FORMAT)
     @Mapping(target = "dueAt", dateFormat = DATE_FORMAT)
     @Mapping(target = "startDate", dateFormat = DATE_FORMAT)
+    @Mapping(target = "lastCompleted", dateFormat = DATE_FORMAT)
     ChoreDto choreToDto(Chore chore);
 
     User dtoToUser(UserDto userDto);
