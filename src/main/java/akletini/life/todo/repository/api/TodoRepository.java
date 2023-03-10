@@ -23,8 +23,10 @@ public interface TodoRepository extends CrudRepository<Todo, Long>,
             (:open is null or t.state=:open) and
             (cast(:due as date) is null or t.dueAt<=:due) and
             (:done is null or t.state=:done) and
-            (:#{#tags == null} = true or (t.tag.id in (:tags)))
+            (:#{#tags == null} = true or (t.tag.id in (:tags))) and
+            t.assignedUser.id=:userId
             """)
     Page<Todo> findFiltered(Pageable pageable, @Param(OPEN) Todo.State open,
-                            @Param(DUE) Date due, @Param(DONE) Todo.State done, @Param("tags") List<Long> tags);
+                            @Param(DUE) Date due, @Param(DONE) Todo.State done,
+                            @Param("tags") List<Long> tags, Long userId);
 }

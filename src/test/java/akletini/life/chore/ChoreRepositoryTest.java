@@ -4,6 +4,7 @@ import akletini.life.chore.repository.api.ChoreRepository;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.user.repository.api.UserRepository;
 import akletini.life.user.repository.entity.User;
+import akletini.life.user.structure.TestUsers;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class ChoreRepositoryTest {
         createInactiveChores(6);
 
         // WHEN
-        Page<Chore> activeChores = choreRepository.findFiltered(PageRequest.of(0, 5), true, null);
+        Page<Chore> activeChores = choreRepository.findFiltered(PageRequest.of(0, 5), true, null, user.getId());
         List<Chore> choresFromDB = activeChores.toList();
 
         // THEN
@@ -81,7 +82,7 @@ public class ChoreRepositoryTest {
 
         // WHEN
         List<Chore> foundChores =
-                choreRepository.findFiltered(PageRequest.of(0, 5), null, LocalDate.now()).toList();
+                choreRepository.findFiltered(PageRequest.of(0, 5), null, LocalDate.now(), user.getId()).toList();
 
         // THEN
         assertEquals(5, foundChores.size());
@@ -108,7 +109,7 @@ public class ChoreRepositoryTest {
 
         // WHEN
         List<Chore> foundChores =
-                choreRepository.findFiltered(PageRequest.of(0, 50), true, LocalDate.now()).toList();
+                choreRepository.findFiltered(PageRequest.of(0, 50), true, LocalDate.now(), user.getId()).toList();
 
         // THEN
         assertEquals(10, foundChores.size());
@@ -117,6 +118,26 @@ public class ChoreRepositoryTest {
         assertTrue(filteredChores.isEmpty());
         List<Boolean> activeStates = foundChores.stream().map(Chore::isActive).toList();
         assertFalse(activeStates.contains(false));
+    }
+
+    @Test
+    public void filterByUser() {
+        // GIVEN
+        List<Chore> testChores = createDueTestChores(2);
+        User defaultGoogleAuthUser = userRepository.save(TestUsers.getDefaultGoogleAuthUser());
+        Chore chore = getNewChore();
+        chore.setAssignedUser(defaultGoogleAuthUser);
+        choreRepository.save(chore);
+
+        // WHEN
+        List<Chore> foundUser1 =
+                choreRepository.findFiltered(PageRequest.of(0, 5), true, null, user.getId()).toList();
+        List<Chore> foundUser2 =
+                choreRepository.findFiltered(PageRequest.of(0, 5), true, null, defaultGoogleAuthUser.getId()).toList();
+
+        // THEN
+        assertEquals(testChores.size(), foundUser1.size());
+        assertEquals(1, foundUser2.size());
     }
 
     private List<Chore> createTestChores(int count) {
