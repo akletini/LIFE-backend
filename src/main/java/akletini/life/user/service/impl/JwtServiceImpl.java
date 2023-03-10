@@ -6,7 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,11 @@ import java.util.function.Function;
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 @Service
+@AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${app.jwtSecret}")
-    private static String SECRET_KEY;
+    public static final String JWT_SECRET = "JWT_SECRET";
+    private Environment env;
 
     @Override
     public String extractUsername(String token) {
@@ -77,7 +79,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(env.getProperty(JWT_SECRET));
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

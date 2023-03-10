@@ -2,7 +2,6 @@ package akletini.life.user.repository.entity;
 
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.todo.repository.entity.Todo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class User implements UserDetails {
     private String name;
     @Column(unique = true)
     private String email;
-    @JsonIgnore
     private String password;
 
     private String imageUrl;
@@ -42,6 +40,7 @@ public class User implements UserDetails {
     private TokenContainer tokenContainer;
 
     @Enumerated(EnumType.STRING)
+    @Column(updatable = false)
     private Role role;
 
     @OneToMany(mappedBy = "user")

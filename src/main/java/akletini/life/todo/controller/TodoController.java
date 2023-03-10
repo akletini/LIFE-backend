@@ -5,8 +5,7 @@ import akletini.life.todo.dto.TodoDto;
 import akletini.life.todo.dto.mapper.TodoMapper;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.TodoService;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +19,12 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/todos")
+@AllArgsConstructor
 public class TodoController {
 
-    @Autowired
     private TodoService todoService;
 
-    private final TodoMapper todoMapper = Mappers.getMapper(TodoMapper.class);
+    private final TodoMapper todoMapper;
 
     @PostMapping(value = "/add")
     public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) {

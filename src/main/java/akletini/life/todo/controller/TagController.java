@@ -4,8 +4,7 @@ import akletini.life.todo.dto.TagDto;
 import akletini.life.todo.dto.mapper.TagMapper;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.service.api.TagService;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +13,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/todos/tags")
+@AllArgsConstructor
 public class TagController {
 
-    @Autowired
     private TagService tagService;
 
-    private final TagMapper tagMapper = Mappers.getMapper(TagMapper.class);
+    private final TagMapper tagMapper;
 
     @PostMapping(value = "/add")
     public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {
@@ -45,7 +44,7 @@ public class TagController {
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<TagDto>> getAllTags() {
         List<Tag> allTags = tagService.getAll();
-        List<TagDto> allToDto = allTags.stream().map(tag -> tagMapper.tagToDto(tag)).toList();
+        List<TagDto> allToDto = allTags.stream().map(tagMapper::tagToDto).toList();
         return ResponseEntity.status(HttpStatus.OK).body(allToDto);
     }
 
