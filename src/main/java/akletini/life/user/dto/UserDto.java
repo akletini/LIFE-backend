@@ -15,6 +15,7 @@ public class UserDto {
     private String password;
     private String imageUrl;
     private boolean loggedIn;
+    private String jwtToken;
     private AuthProvider authProvider;
     private TokenContainer tokenContainer;
 }

@@ -1,9 +1,10 @@
-package akletini.life.user.service;
+package akletini.life.user.service.impl;
 
 import akletini.life.user.repository.api.UserRepository;
 import akletini.life.user.repository.entity.AuthProvider;
 import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
+import akletini.life.user.service.api.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;

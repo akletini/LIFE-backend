@@ -5,7 +5,7 @@ import akletini.life.chore.repository.entity.Interval;
 import akletini.life.shared.utils.DateUtils;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.user.repository.entity.User;
-import akletini.life.user.service.UserService;
+import akletini.life.user.service.api.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
@@ -76,7 +76,7 @@ public class MailServiceImpl implements MailService {
         chores = chores.stream().
                 filter(chore -> chore.getDueAt().isAfter(startDate)
                         && chore.getDueAt().isBefore(endDate)).collect(Collectors.toList());
-        chores = computeIntervals(chores, endDate);
+        computeIntervals(chores, endDate);
         chores.sort(Comparator.comparing(Chore::getDueAt).thenComparing(Chore::getDuration));
         sb.append("<ul>");
         chores.forEach(chore -> sb.append("<li> ")
@@ -108,7 +108,7 @@ public class MailServiceImpl implements MailService {
         return sb.toString();
     }
 
-    private List<Chore> computeIntervals(List<Chore> chores, LocalDate endDate) {
+    private void computeIntervals(List<Chore> chores, LocalDate endDate) {
         Date endDateAsDate = localDateToDate(endDate);
         List<Chore> computedChores = new ArrayList<>();
         for (Chore chore : chores) {
@@ -124,7 +124,6 @@ public class MailServiceImpl implements MailService {
             }
         }
         chores.addAll(computedChores);
-        return chores;
     }
 
     private String getDayAsString(LocalDate date) {
