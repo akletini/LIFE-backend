@@ -6,8 +6,7 @@ import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.service.ChoreService;
 import akletini.life.shared.response.HttpResponse;
 import akletini.life.todo.dto.TodoDto;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +22,13 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/chores")
+@AllArgsConstructor
 public class ChoreController {
 
-    @Autowired
     private ChoreService choreService;
 
-    private final ChoreMapper choreMapper = Mappers.getMapper(ChoreMapper.class);
+    private final ChoreMapper choreMapper;
+
     @PostMapping("/add")
     public ResponseEntity<ChoreDto> addChore(@RequestBody ChoreDto choreDto) {
         Chore storedChore = choreService.store(choreMapper.dtoToChore(choreDto));

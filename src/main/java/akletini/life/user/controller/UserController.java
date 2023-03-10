@@ -5,7 +5,6 @@ import akletini.life.user.dto.mapper.UserMapper;
 import akletini.life.user.repository.entity.User;
 import akletini.life.user.service.api.UserService;
 import lombok.AllArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper;
 
     @PostMapping("/add")
     public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {

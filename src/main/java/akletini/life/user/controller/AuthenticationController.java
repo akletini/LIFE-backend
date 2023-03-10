@@ -6,7 +6,6 @@ import akletini.life.user.repository.entity.auth.AuthenticationRequest;
 import akletini.life.user.repository.entity.auth.AuthenticationResponse;
 import akletini.life.user.service.api.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody UserDto userDto) {
