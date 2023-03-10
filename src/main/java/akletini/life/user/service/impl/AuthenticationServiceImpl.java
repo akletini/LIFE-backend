@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +34,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
         String jwtToken = jwtService.generateToken(user);
-        User savedUser = repository.save(user);
-        saveUserToken(savedUser, jwtToken);
-        return new AuthenticationResponse(jwtToken, savedUser);
+        Optional<User> userOptional = repository.findByEmail(user.getEmail());
+        User userFromDB = userOptional.orElseGet(() -> repository.save(user));
+        saveUserToken(userFromDB, jwtToken);
+        return new AuthenticationResponse(jwtToken, userFromDB);
     }
 
     @Override
