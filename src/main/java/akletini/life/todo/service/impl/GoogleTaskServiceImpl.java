@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -85,18 +86,24 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
             }
             log.info("Creating Google task {}", todo.getTitle());
 
-            Task task = new Task();
-            task.setTitle(todo.getTitle());
-            task.setKind("tasks#task");
-            DateTime dateTime = updateDateTime(todo);
-            task.setDue(dateTime.toStringRfc3339());
-
-            service.tasks().insert(TODO_TASK_ID, task).execute();
+            insertTask(todo, service);
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Async
+    private void insertTask(Todo todo, Tasks service) throws IOException {
+        Task task = new Task();
+        task.setTitle(todo.getTitle());
+        task.setKind("tasks#task");
+        DateTime dateTime = updateDateTime(todo);
+        task.setDue(dateTime.toStringRfc3339());
+
+        service.tasks().insert(TODO_TASK_ID, task).execute();
+    }
+
+    @Async
     private void updateTodo(Todo todo, Tasks service) throws IOException {
         var tasks = service.tasks().list(TODO_TASK_ID).execute();
         List<Task> taskList = tasks.getItems();
@@ -122,6 +129,7 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     }
 
     @Override
+    @Async
     public void deleteTask(Todo todo) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
