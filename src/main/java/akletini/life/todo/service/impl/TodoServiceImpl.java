@@ -25,6 +25,7 @@ import java.util.Optional;
 import static akletini.life.shared.constants.FilterConstants.*;
 import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
 import static akletini.life.shared.validation.Errors.ENTITY_NOT_FOUND;
+import static akletini.life.user.ContextUtils.getCurrentUser;
 
 @Service
 @Log4j2
@@ -103,7 +104,8 @@ public class TodoServiceImpl implements TodoService {
                     filters.contains(OPEN) ? Todo.State.OPEN : null,
                     filters.contains(DUE) ? new Date() : null,
                     filters.contains(DONE) ? Todo.State.DONE : null,
-                    tags.orElse(null));
+                    tags.orElse(null),
+                    getCurrentUser().getId());
         }
         return todoRepository.findAll(pageRequest);
     }

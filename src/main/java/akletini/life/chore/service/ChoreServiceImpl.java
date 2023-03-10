@@ -26,6 +26,7 @@ import static akletini.life.shared.constants.FilterConstants.ACTIVE;
 import static akletini.life.shared.constants.FilterConstants.DUE;
 import static akletini.life.shared.utils.DateUtils.*;
 import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
+import static akletini.life.user.ContextUtils.getCurrentUser;
 
 @Service
 @Log4j2
@@ -47,7 +48,8 @@ public class ChoreServiceImpl implements ChoreService {
             List<String> filters = filterBy.get();
             return choreRepository.findFiltered(pageRequest,
                     filters.contains(ACTIVE),
-                    filters.contains(DUE) ? LocalDate.now() : null);
+                    filters.contains(DUE) ? LocalDate.now() : null,
+                    getCurrentUser().getId());
         }
         return choreRepository.findAll(pageRequest);
     }

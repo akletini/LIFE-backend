@@ -63,7 +63,7 @@ public class TodoRepositoryTest {
 
         // WHEN
         Page<Todo> filtered = todoRepository.findFiltered(PageRequest.
-                of(0, 10), OPEN, null, null, null);
+                of(0, 10), OPEN, null, null, null, user.getId());
         // THEN
         assertEquals(8, filtered.toList().size());
     }
@@ -82,7 +82,8 @@ public class TodoRepositoryTest {
             }
         }
         Page<Todo> filtered = todoRepository.findFiltered(PageRequest.
-                of(0, 10), OPEN, null, null, List.of(testTags.get(0).getId(), tag.getId()));
+                of(0, 10), OPEN, null, null, List.of(testTags.get(0).getId(), tag.getId()),
+                user.getId());
         // THEN
         assertEquals(9, filtered.toList().size());
     }
@@ -107,7 +108,7 @@ public class TodoRepositoryTest {
             }
         }
         Page<Todo> filtered = todoRepository.findFiltered(PageRequest.
-                of(0, 10), OPEN, null, null, List.of(testTags.get(0).getId(), tag.getId()));
+                of(0, 10), OPEN, null, null, List.of(testTags.get(0).getId(), tag.getId()), user.getId());
         // THEN
         assertEquals(7, filtered.toList().size());
     }
