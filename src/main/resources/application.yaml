@@ -40,6 +40,8 @@ springdoc:
 name: dev-yaml
 server:
   port: 6969
+app:
+  jwtSecret: ${JWT_SECRET}
 ---
 spring:
   config:

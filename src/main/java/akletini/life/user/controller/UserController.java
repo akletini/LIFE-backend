@@ -3,17 +3,17 @@ package akletini.life.user.controller;
 import akletini.life.user.dto.UserDto;
 import akletini.life.user.dto.mapper.UserMapper;
 import akletini.life.user.repository.entity.User;
-import akletini.life.user.service.UserService;
+import akletini.life.user.service.api.UserService;
+import lombok.AllArgsConstructor;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    @Autowired
     private UserService userService;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 

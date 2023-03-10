@@ -5,7 +5,7 @@ import akletini.life.todo.service.api.GoogleTaskService;
 import akletini.life.todo.service.api.TodoService;
 import akletini.life.user.repository.entity.TokenContainer;
 import akletini.life.user.repository.entity.User;
-import akletini.life.user.service.UserService;
+import akletini.life.user.service.api.UserService;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;

@@ -1,4 +1,4 @@
-package akletini.life.user.service;
+package akletini.life.user.service.api;
 
 import akletini.life.shared.EntityService;
 import akletini.life.user.repository.entity.User;
