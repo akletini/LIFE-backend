@@ -1,4 +1,4 @@
-package akletini.life.todo.exception.custom;
+package akletini.life.todo.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

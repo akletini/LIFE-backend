@@ -1,5 +1,6 @@
 package akletini.life.todo.repository.api;
 
+import akletini.life.task.entity.TaskRepository;
 import akletini.life.todo.repository.entity.Todo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ import static akletini.life.shared.constants.FilterConstants.*;
 
 @Repository
 public interface TodoRepository extends CrudRepository<Todo, Long>,
-        PagingAndSortingRepository<Todo, Long> {
+        PagingAndSortingRepository<Todo, Long>, TaskRepository<Todo> {
 
     @Query(value = """
             SELECT t FROM Todo t WHERE

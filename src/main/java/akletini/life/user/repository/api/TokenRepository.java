@@ -1,6 +1,7 @@
 package akletini.life.user.repository.api;
 
 import akletini.life.user.repository.entity.Token;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 
@@ -15,5 +16,11 @@ public interface TokenRepository extends ListCrudRepository<Token, Long> {
       where u.id = :id and (t.expired = false or t.revoked = false)\s
       """)
     List<Token> findAllValidTokenByUser(Long id);
+
+    @Modifying
+    @Query(value = """
+            delete from Token t where t.expired = true or t.revoked = true
+            """)
+    void deleteExpiredTokens();
     Optional<Token> findByToken(String token);
 }

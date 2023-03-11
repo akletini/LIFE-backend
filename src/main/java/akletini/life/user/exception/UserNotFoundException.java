@@ -1,11 +1,11 @@
-package akletini.life.chore.exception.custom;
+package akletini.life.user.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class ChoreNotFoundException extends RuntimeException {
-    public ChoreNotFoundException(String message) {
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
         super(message);
     }
 }

@@ -26,21 +26,6 @@ public class UserServiceTest {
     UserService userService;
 
     @Test
-    public void saveUserWithEmptyEmail() {
-        // Given
-        User credentialUser = TestUsers.getDefaultCredentialUser();
-        User googleAuthUser = TestUsers.getDefaultGoogleAuthUser();
-
-        // When
-        credentialUser.setEmail(null);
-        googleAuthUser.setEmail(null);
-
-        // Then
-        assertThrows(Exception.class, () -> userService.store(credentialUser));
-        assertThrows(Exception.class, () -> userService.store(googleAuthUser));
-    }
-
-    @Test
     public void saveEmptyPasswordOnCredentials() {
         // Given
         User credentialUser = TestUsers.getDefaultCredentialUser();

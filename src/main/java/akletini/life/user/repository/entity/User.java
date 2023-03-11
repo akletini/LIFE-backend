@@ -3,10 +3,7 @@ package akletini.life.user.repository.entity;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.todo.repository.entity.Todo;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +17,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -30,12 +28,13 @@ public class User implements UserDetails {
 
     private String name;
     @Column(unique = true)
+    @NonNull
     private String email;
     private String password;
 
     private String imageUrl;
-    private boolean loggedIn;
     @Enumerated(EnumType.STRING)
+    @NonNull
     private AuthProvider authProvider;
     private TokenContainer tokenContainer;
 

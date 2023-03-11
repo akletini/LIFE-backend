@@ -12,7 +12,6 @@ public class TestUsers {
         User user = new User();
         user.setName("Horst");
         user.setPassword("Top-Secret");
-        user.setLoggedIn(true);
         user.setEmail("horst@horst.de");
         user.setAuthProvider(AuthProvider.CREDENTIALS);
         user.setTokenContainer(getTokenContainer());
@@ -22,7 +21,6 @@ public class TestUsers {
     public static User getDefaultGoogleAuthUser() {
         User user = new User();
         user.setName("Horst");
-        user.setLoggedIn(true);
         user.setEmail("horst@gmail.de");
         user.setAuthProvider(AuthProvider.GOOGLE);
         user.setTokenContainer(getTokenContainer());

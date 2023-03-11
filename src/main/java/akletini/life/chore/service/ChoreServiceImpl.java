@@ -1,16 +1,16 @@
 package akletini.life.chore.service;
 
-import akletini.life.chore.exception.custom.ChoreNotFoundException;
-import akletini.life.chore.exception.custom.ChoreStoreException;
+import akletini.life.chore.exception.ChoreNotFoundException;
+import akletini.life.chore.exception.ChoreStoreException;
 import akletini.life.chore.repository.api.ChoreRepository;
 import akletini.life.chore.repository.entity.Chore;
 import akletini.life.chore.repository.entity.Interval;
-import akletini.life.chore.validation.ChoreValidation;
 import akletini.life.shared.utils.DateUtils;
+import akletini.life.shared.validation.EntityValidation;
 import akletini.life.shared.validation.Errors;
 import akletini.life.shared.validation.ValidationRule;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,13 +29,12 @@ import static akletini.life.shared.validation.Errors.COULD_NOT_STORE;
 import static akletini.life.user.ContextUtils.getCurrentUser;
 
 @Service
+@AllArgsConstructor
 @Log4j2
 public class ChoreServiceImpl implements ChoreService {
-    @Autowired
     private ChoreRepository choreRepository;
 
-    @Autowired
-    ChoreValidation validation;
+    private EntityValidation<Chore> validation;
 
     @Override
     public Page<Chore> getChores(int page, int pageSize, Optional<String> sortBy,

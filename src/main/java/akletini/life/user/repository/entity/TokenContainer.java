@@ -1,6 +1,7 @@
 package akletini.life.user.repository.entity;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -10,5 +11,6 @@ public class TokenContainer {
     private String accessToken;
 
     private String accessTokenCreation;
+    @Size(min = 10)
     private String refreshToken;
 }

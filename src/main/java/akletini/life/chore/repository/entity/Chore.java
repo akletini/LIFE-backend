@@ -1,7 +1,8 @@
 package akletini.life.chore.repository.entity;
 
-import akletini.life.user.repository.entity.User;
-import jakarta.persistence.*;
+import akletini.life.task.entity.Task;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,6 @@ import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -19,23 +19,13 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "chores")
-public class Chore {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Long id;
+public class Chore extends Task {
 
-    @NonNull
-    private String title;
-    @NonNull
-    private LocalDateTime createdAt;
-    @NonNull
-    private LocalDate dueAt;
     @NonNull
     private LocalDate startDate;
 
     private LocalDate lastCompleted;
-    private String description;
+
     private boolean active;
     private boolean shiftInterval;
 
@@ -45,14 +35,6 @@ public class Chore {
 
     @NonNull
     private Interval interval;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User assignedUser;
-
-    @PreRemove
-    private void preRemove() {
-        assignedUser = null;
-    }
 
     @Override
     public boolean equals(Object o) {
