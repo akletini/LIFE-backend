@@ -1,6 +1,6 @@
 package akletini.life.todo;
 
-import akletini.life.todo.exception.custom.TagStoreException;
+import akletini.life.todo.exception.TagStoreException;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.service.api.TagService;
 import akletini.life.todo.structure.TestTodos;

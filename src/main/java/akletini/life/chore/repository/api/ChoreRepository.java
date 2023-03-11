@@ -1,6 +1,7 @@
 package akletini.life.chore.repository.api;
 
 import akletini.life.chore.repository.entity.Chore;
+import akletini.life.task.entity.TaskRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 
 public interface ChoreRepository extends CrudRepository<Chore, Long>,
-        PagingAndSortingRepository<Chore, Long> {
+        PagingAndSortingRepository<Chore, Long>, TaskRepository<Chore> {
 
     @Query(value = """
             SELECT c FROM Chore c WHERE

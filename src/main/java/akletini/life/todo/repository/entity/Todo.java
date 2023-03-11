@@ -1,6 +1,6 @@
 package akletini.life.todo.repository.entity;
 
-import akletini.life.user.repository.entity.User;
+import akletini.life.task.entity.Task;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +9,6 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.io.File;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -19,34 +17,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "todos")
-public class Todo {
+public class Todo extends Task {
     public enum State {OPEN, DONE}
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String title;
-
-    private LocalDateTime createdAt;
-    private LocalDate dueAt;
-    private String description;
 
     @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "TAG_ID", referencedColumnName = "ID")
     private Tag tag;
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "user_id")
-    private User assignedUser;
-
     private File attachedFile;
     @Enumerated(EnumType.STRING)
     private State state;
 
-    @PreRemove
-    private void preRemove() {
-        assignedUser = null;
-    }
 
     @Override
     public boolean equals(Object o) {

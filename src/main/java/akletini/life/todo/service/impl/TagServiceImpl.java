@@ -1,7 +1,7 @@
 package akletini.life.todo.service.impl;
 
-import akletini.life.todo.exception.custom.TagNotFoundException;
-import akletini.life.todo.exception.custom.TagStoreException;
+import akletini.life.todo.exception.TagNotFoundException;
+import akletini.life.todo.exception.TagStoreException;
 import akletini.life.todo.repository.api.TagRepository;
 import akletini.life.todo.repository.entity.Tag;
 import akletini.life.todo.service.api.TagService;

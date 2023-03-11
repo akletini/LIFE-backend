@@ -6,17 +6,25 @@ import java.util.ResourceBundle;
 public class Errors {
 
     // Misc
-    public static final String WRONG_DATE_FORMAT = "wrongDateFormat";
     public static final String ENTITY_NOT_FOUND = "entityNotFound";
     public static final String COULD_NOT_STORE = "couldNotStore";
 
-    public static class TODO {
-        public static final String CREATED_DATE_UNCHANGED = "createdDateUnchanged";
+    public interface USER {
+        String INVALID_TOKEN_CONTAINER = "invalidTokenContainer";
+
+        String MISSING_PASSWORD = "missingPassword";
     }
 
-    public static class CHORE {
-        public static final String POSITIVE_INTERVAL = "positiveInterval";
-        public static final String START_IN_THE_PAST = "startDateInThePast";
+    public interface CHORE {
+        String POSITIVE_INTERVAL = "positiveInterval";
+        String START_IN_THE_PAST = "startDateInThePast";
+    }
+
+    public interface TASK {
+
+        String CREATED_DATE_UNCHANGED = "createdDateUnchanged";
+
+        String ASSIGNED_USER_MATCH = "assignedUserMatch";
     }
 
 

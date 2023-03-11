@@ -1,17 +1,17 @@
 package akletini.life.todo.service.impl;
 
+import akletini.life.shared.validation.EntityValidation;
 import akletini.life.shared.validation.Errors;
 import akletini.life.shared.validation.ValidationRule;
-import akletini.life.todo.exception.custom.TodoNotFoundException;
-import akletini.life.todo.exception.custom.TodoStoreException;
+import akletini.life.todo.exception.TodoNotFoundException;
+import akletini.life.todo.exception.TodoStoreException;
 import akletini.life.todo.repository.api.TodoRepository;
 import akletini.life.todo.repository.entity.Todo;
 import akletini.life.todo.service.api.GoogleTaskService;
 import akletini.life.todo.service.api.TodoService;
-import akletini.life.todo.validation.TodoValidation;
 import akletini.life.user.repository.entity.AuthProvider;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,17 +28,15 @@ import static akletini.life.shared.validation.Errors.ENTITY_NOT_FOUND;
 import static akletini.life.user.ContextUtils.getCurrentUser;
 
 @Service
+@AllArgsConstructor
 @Log4j2
 public class TodoServiceImpl implements TodoService {
 
-    @Autowired
-    GoogleTaskService googleTaskService;
+    private GoogleTaskService googleTaskService;
 
-    @Autowired
     private TodoRepository todoRepository;
 
-    @Autowired
-    TodoValidation validation;
+    private EntityValidation<Todo> validation;
 
     @Override
     public boolean validate(Todo todo) {
