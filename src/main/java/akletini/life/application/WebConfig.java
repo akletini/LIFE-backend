@@ -11,6 +11,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 @Configuration
 @EnableAsync
 @EnableScheduling
@@ -27,7 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        config.addAllowedOrigin("http://localhost:3000");
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://www.thelifeapp.de",
+                "https://thelifeapp.de"));
         source.registerCorsConfiguration("/**", config);
         return source;
     }
