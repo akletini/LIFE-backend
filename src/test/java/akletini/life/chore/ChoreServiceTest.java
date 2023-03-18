@@ -100,6 +100,27 @@ public class ChoreServiceTest {
     }
 
     @Test
+    public void sameDueDateAfterOtherModification() {
+        try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
+            // GIVEN
+            utils.when(ContextUtils::getCurrentUser).thenReturn(user);
+            Chore chore = getNewChore();
+            chore.setStartDate(dateToLocalDate(addWeeks(new Date(), 5)));
+            chore.setAssignedUser(user);
+            chore.setShiftInterval(true);
+            Chore original = choreService.store(chore);
+            LocalDate originalDueAt = original.getDueAt();
+
+            // WHEN
+            chore.setTitle("Different title");
+            Chore stored = choreService.store(chore);
+
+            // THEN
+            assertEquals(originalDueAt, stored.getDueAt());
+        }
+    }
+
+    @Test
     public void completeWithShift() {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);

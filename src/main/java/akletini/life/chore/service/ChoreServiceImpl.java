@@ -17,10 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static akletini.life.shared.constants.FilterConstants.ACTIVE;
 import static akletini.life.shared.constants.FilterConstants.DUE;
@@ -57,9 +54,9 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore completeChore(Chore chore) {
         validate(chore);
         if (chore.isShiftInterval()) {
-            chore.setDueAt(dateToLocalDate(computeDueDate(new Date(), chore.getInterval())));
+            chore.setDueAt(dateToLocalDate(computeDueDate(chore.getId(), new Date(), chore.getInterval())));
         } else {
-            chore.setDueAt(dateToLocalDate(computeDueDate(localDateToDate(chore.getDueAt()), chore.getInterval())));
+            chore.setDueAt(dateToLocalDate(computeDueDate(chore.getId(), localDateToDate(chore.getDueAt()), chore.getInterval())));
         }
         chore.setLastCompleted(LocalDate.now());
         chore = choreRepository.save(chore);
@@ -84,7 +81,7 @@ public class ChoreServiceImpl implements ChoreService {
     public Chore store(Chore chore) {
         if (chore != null) {
             validate(chore);
-            Date dueDate = chore.getDueAt() != null ? computeDueDate(localDateToDate(chore.getStartDate()), chore.getInterval()) : localDateToDate(chore.getStartDate());
+            Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getId(), localDateToDate(chore.getStartDate()), chore.getInterval()) : localDateToDate(chore.getStartDate());
             chore.setDueAt(dateToLocalDate(dueDate));
             return choreRepository.save(chore);
         }
@@ -113,7 +110,11 @@ public class ChoreServiceImpl implements ChoreService {
         choreRepository.delete(chore);
     }
 
-    private Date computeDueDate(Date startDate, Interval interval) {
+    private Date computeDueDate(Long choreId, Date startDate, Interval interval) {
+        if (intervalUnchanged(choreId, interval)) {
+            return startDate;
+        }
+
         int intervalValue = interval.getValue();
         Date date = startDate;
         date = addInterval(interval, intervalValue, date);
@@ -121,6 +122,18 @@ public class ChoreServiceImpl implements ChoreService {
             date = addInterval(interval, intervalValue, date);
         }
         return date;
+    }
+
+    private boolean intervalUnchanged(Long choreId, Interval interval) {
+        if (choreId == null) {
+            return false;
+        }
+        Optional<Chore> choreOptional = choreRepository.findById(choreId);
+        if (choreOptional.isPresent()) {
+            Chore chore = choreOptional.get();
+            return Objects.equals(interval, chore.getInterval());
+        }
+        return false;
     }
 
 }
