@@ -37,10 +37,10 @@ jobs:
     needs: build
     steps:
       - name: Deploy to cloud
-        uses: cross-the-world/ssh-pipeline@master
+        uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ vars.HOST }}
-          user: $ {{ vars.USER }}
+          username: $ {{ vars.USER }}
           key: ${{ secrets.SSH_KEY }}
           connect_timeout: 10s
           script: |
