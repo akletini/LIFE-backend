@@ -37,7 +37,7 @@ jobs:
     needs: build
     steps:
       - name: Deploy to cloud
-        uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
+        uses: cross-the-world/ssh-pipeline@master
         with:
           host: ${{ vars.HOST }}
           user: $ {{ vars.USER }}
