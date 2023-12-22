@@ -1,0 +1,19 @@
+.tag {
+    border-radius: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    color: white;
+}
+
+.dueBox {
+    border: 2px solid red;
+    border-radius: 0.5rem;
+    border-width; medium;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    background-color: rgb(229 231 235);
+}

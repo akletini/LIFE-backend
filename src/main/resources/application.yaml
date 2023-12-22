@@ -37,11 +37,15 @@ spring:
 springdoc:
   api-docs:
     path: /api-docs
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type: TRACE
 name: dev-yaml
-server:
-  port: 6969
-  servlet:
-    context-path: /restApi
+#server:
+#  port: 6969
+#  servlet:
+#    context-path: /restApi
 app:
   jwtSecret: ${JWT_SECRET}
 ---
