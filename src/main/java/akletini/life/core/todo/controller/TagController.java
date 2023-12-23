@@ -36,8 +36,8 @@ public class TagController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
-    public ResponseEntity<TagDto> deleteTag(@PathVariable Long id) {
-        tagService.delete(id);
+    public ResponseEntity<TagDto> deleteTag(@PathVariable TagDto tagDto) {
+        tagService.delete(tagMapper.dtoToTag(tagDto));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

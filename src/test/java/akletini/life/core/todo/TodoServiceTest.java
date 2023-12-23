@@ -5,7 +5,7 @@ import akletini.life.core.chore.repository.api.ChoreRepository;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.shared.utils.DateUtils;
 import akletini.life.core.shared.validation.Errors;
-import akletini.life.core.todo.exception.TodoStoreException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TagRepository;
 import akletini.life.core.todo.repository.api.TodoRepository;
 import akletini.life.core.todo.repository.entity.Tag;
@@ -111,7 +111,7 @@ public class TodoServiceTest {
 
             // Then
             Todo finalTodo = todo;
-            TodoStoreException todoStoreException = assertThrows(TodoStoreException.class,
+            InvalidDataException todoStoreException = assertThrows(InvalidDataException.class,
                     () -> todoService.store(finalTodo));
             assertEquals(todoStoreException.getMessage(), Errors.getError(CREATED_DATE_UNCHANGED));
             assertTrue(DateUtils.isSameInstant(localDateTimeToDate(initialCreationDate),
@@ -153,7 +153,8 @@ public class TodoServiceTest {
             // Then
             assertTrue(userByID.isPresent());
             User user = userByID.get();
-            assertEquals(storedTodo.getAssignedUser().getTokenContainer().getAccessToken(), user.getTokenContainer().getAccessToken());
+            assertEquals(storedTodo.getAssignedUser().getTokenContainer().getAccessToken(),
+                    user.getTokenContainer().getAccessToken());
         }
     }
 

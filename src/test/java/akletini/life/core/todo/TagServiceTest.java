@@ -1,6 +1,6 @@
 package akletini.life.core.todo;
 
-import akletini.life.core.todo.exception.TagStoreException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.entity.Tag;
 import akletini.life.core.todo.service.api.TagService;
 import akletini.life.core.todo.structure.TestTodos;
@@ -36,7 +36,7 @@ public class TagServiceTest {
         newTag.setColor("#ffffff");
 
         // Then
-        assertThrows(TagStoreException.class, () -> tagService.store(newTag));
+        assertThrows(InvalidDataException.class, () -> tagService.store(newTag));
         assertEquals(tag.getName(), tagService.getById(tag.getId()).getName());
     }
 

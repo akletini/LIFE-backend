@@ -1,10 +1,10 @@
 package akletini.life.core.chore;
 
-import akletini.life.core.chore.exception.ChoreStoreException;
 import akletini.life.core.chore.repository.api.ChoreRepository;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.repository.entity.Interval;
 import akletini.life.core.chore.service.ChoreService;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.user.ContextUtils;
 import akletini.life.core.user.repository.api.UserRepository;
 import akletini.life.core.user.repository.entity.User;
@@ -192,7 +192,8 @@ public class ChoreServiceTest {
             Chore completedChore = choreService.completeChore(chore);
 
             Date targetDate = addDays(currentDate, 5);
-            assertEquals(dateToLocalDate(targetDate).toString(), completedChore.getDueAt().toString());
+            assertEquals(dateToLocalDate(targetDate).toString(),
+                    completedChore.getDueAt().toString());
         }
     }
 
@@ -209,7 +210,8 @@ public class ChoreServiceTest {
             Chore completedChore = choreService.completeChore(chore);
 
             Date targetDate = addDays(currentDate, 7);
-            assertEquals(dateToLocalDate(targetDate).toString(), completedChore.getDueAt().toString());
+            assertEquals(dateToLocalDate(targetDate).toString(),
+                    completedChore.getDueAt().toString());
         }
     }
 
@@ -227,7 +229,8 @@ public class ChoreServiceTest {
             Chore completedChore = choreService.completeChore(chore);
 
             Date targetDate = addDays(currentDate, chore.getInterval().getValue() * 2 + delay);
-            assertEquals(dateToLocalDate(targetDate).toString(), completedChore.getDueAt().toString());
+            assertEquals(dateToLocalDate(targetDate).toString(),
+                    completedChore.getDueAt().toString());
         }
     }
 
@@ -237,7 +240,8 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         chore.setStartDate(dateToLocalDate(addDays(new Date(), -1)));
 
-        ChoreStoreException choreStoreException = assertThrows(ChoreStoreException.class, () -> choreService.store(chore));
+        InvalidDataException choreStoreException = assertThrows(InvalidDataException.class,
+                () -> choreService.store(chore));
         assertEquals(choreStoreException.getMessage(), getError(START_IN_THE_PAST));
     }
 
@@ -262,7 +266,8 @@ public class ChoreServiceTest {
         chore.setAssignedUser(user);
         chore.setInterval(new Interval(-1, Interval.DateUnit.DAYS));
 
-        ChoreStoreException choreStoreException = assertThrows(ChoreStoreException.class, () -> choreService.store(chore));
+        InvalidDataException choreStoreException = assertThrows(InvalidDataException.class,
+                () -> choreService.store(chore));
         assertEquals(choreStoreException.getMessage(), getError(POSITIVE_INTERVAL));
     }
 
@@ -299,7 +304,8 @@ public class ChoreServiceTest {
 
             Chore storedChore = choreService.store(chore);
 
-            assertEquals(storedChore.getDueAt().toString(), dateToLocalDate(addMonths(currentDate, 3)).toString());
+            assertEquals(storedChore.getDueAt().toString(), dateToLocalDate(addMonths(currentDate
+                    , 3)).toString());
         }
     }
 }

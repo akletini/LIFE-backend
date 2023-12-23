@@ -1,7 +1,6 @@
 package akletini.life.core.chore.service;
 
-import akletini.life.core.chore.exception.ChoreNotFoundException;
-import akletini.life.core.chore.exception.ChoreStoreException;
+
 import akletini.life.core.chore.repository.api.ChoreRepository;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.repository.entity.Interval;
@@ -10,6 +9,8 @@ import akletini.life.core.shared.utils.DateUtils;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.ValidationRule;
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -65,7 +66,7 @@ public class ChoreServiceImpl implements ChoreService {
         validationRules.forEach(rule -> {
             Optional<String> error = rule.validate(chore);
             if (error.isPresent()) {
-                ChoreStoreException exception = new ChoreStoreException(error.get());
+                InvalidDataException exception = new InvalidDataException(error.get());
                 log.error(exception);
                 throw exception;
             }
@@ -75,27 +76,20 @@ public class ChoreServiceImpl implements ChoreService {
 
     @Override
     public Chore store(Chore chore) {
-        if (chore != null) {
-            validate(chore);
-            Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getId(),
-                    DateUtils.localDateToDate(chore.getStartDate()), chore.getInterval()) :
-                    DateUtils.localDateToDate(chore.getStartDate());
-            chore.setDueAt(DateUtils.dateToLocalDate(dueDate));
-            return choreRepository.save(chore);
-        }
-        ChoreStoreException choreStoreException =
-                new ChoreStoreException(Errors.getError(Errors.COULD_NOT_STORE,
-                        Chore.class.getSimpleName()));
-        log.error(choreStoreException);
-        throw choreStoreException;
+        validate(chore);
+        Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getId(),
+                DateUtils.localDateToDate(chore.getStartDate()), chore.getInterval()) :
+                DateUtils.localDateToDate(chore.getStartDate());
+        chore.setDueAt(DateUtils.dateToLocalDate(dueDate));
+        return choreRepository.save(chore);
     }
 
     @Override
     public Chore getById(Long id) {
         log.info("Searching chore with id {}", id);
         return choreRepository.findById(id).orElseThrow(() -> {
-            ChoreNotFoundException exception =
-                    new ChoreNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
+            EntityNotFoundException exception =
+                    new EntityNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
                             Chore.class.getSimpleName(), id));
             log.error(exception);
             return exception;

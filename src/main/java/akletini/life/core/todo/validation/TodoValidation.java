@@ -2,6 +2,7 @@ package akletini.life.core.todo.validation;
 
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.ValidationRule;
+import akletini.life.core.shared.validation.rule.EntityNotNullRule;
 import akletini.life.core.task.validation.AssignedUserMatchRule;
 import akletini.life.core.task.validation.CreatedDateUnchangedRule;
 import akletini.life.core.todo.repository.entity.Todo;
@@ -17,12 +18,14 @@ public class TodoValidation implements EntityValidation<Todo> {
     private CreatedDateUnchangedRule<Todo> createdDateUnchangedRule;
 
     private AssignedUserMatchRule<Todo> assignedUserMatchRule;
+    private EntityNotNullRule<Todo> entityNotNullRule;
 
     @Override
     public List<ValidationRule<Todo>> getValidationRules() {
         final List<ValidationRule<Todo>> validationRules = new ArrayList<>();
         validationRules.add(createdDateUnchangedRule);
         validationRules.add(assignedUserMatchRule);
+        validationRules.add(entityNotNullRule);
         return validationRules;
     }
 }

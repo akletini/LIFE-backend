@@ -1,30 +1,47 @@
 package akletini.life.core.todo.service.impl;
 
-import akletini.life.core.todo.exception.TagNotFoundException;
-import akletini.life.core.todo.exception.TagStoreException;
+import akletini.life.core.shared.validation.EntityValidation;
+import akletini.life.core.shared.validation.ValidationRule;
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.EntityNullException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TagRepository;
 import akletini.life.core.todo.repository.entity.Tag;
 import akletini.life.core.todo.service.api.TagService;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.IterableUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Log4j2
+@AllArgsConstructor
 public class TagServiceImpl implements TagService {
 
-    @Autowired
     private TagRepository tagRepository;
 
+    private EntityValidation<Tag> tagValidation;
+
+    @Override
+    public boolean validate(Tag tag) {
+        List<ValidationRule<Tag>> validationRules = tagValidation.getValidationRules();
+        validationRules.forEach(rule -> {
+            Optional<String> error = rule.validate(tag);
+            if (error.isPresent()) {
+                InvalidDataException invalidDataException = new InvalidDataException(error.get());
+                log.error(invalidDataException);
+                throw invalidDataException;
+            }
+        });
+        return true;
+    }
+
     public Tag store(Tag tag) {
-        if (tag != null) {
-            validateUniqueName(tag);
-            return tagRepository.save(tag);
-        }
-        throw new TagStoreException("Could not store Tag object");
+        validate(tag);
+        return tagRepository.save(tag);
     }
 
     @Override
@@ -33,13 +50,21 @@ public class TagServiceImpl implements TagService {
         if (tagById.isPresent()) {
             return tagById.get();
         }
-        throw new TagNotFoundException("Could not find Tag with ID " + id);
+        throw new EntityNotFoundException("Could not find Tag with ID " + id);
+    }
+
+    @Override
+    public void delete(Tag tag) {
+        if (tag != null) {
+            tagRepository.deleteById(tag.getId());
+        }
+
     }
 
     @Override
     public Tag getByName(String name) {
         Optional<Tag> tagByName = tagRepository.findByName(name);
-        return tagByName.orElseThrow(() -> new TagNotFoundException("Could not find Tag with name" +
+        return tagByName.orElseThrow(() -> new EntityNullException("Could not find Tag with name" +
                 " " + name));
     }
 
@@ -47,19 +72,5 @@ public class TagServiceImpl implements TagService {
     public List<Tag> getAll() {
         Iterable<Tag> allTags = tagRepository.findAll();
         return IterableUtils.toList(allTags);
-    }
-
-    @Override
-    public void delete(Long id) {
-        tagRepository.deleteById(id);
-    }
-
-    private void validateUniqueName(Tag tag) {
-        Optional<Tag> getByName = tagRepository.findByName(tag.getName());
-        if (getByName.isPresent()) {
-            if (!Objects.equals(getByName.get().getId(), tag.getId())) {
-                throw new TagStoreException("Tag name is not unique");
-            }
-        }
     }
 }

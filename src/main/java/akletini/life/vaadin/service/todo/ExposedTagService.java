@@ -32,7 +32,7 @@ public class ExposedTagService {
     }
 
     public void delete(TagDto tagDto) {
-        tagService.delete(tagDto.getId());
+        tagService.delete(tagMapper.dtoToTag(tagDto));
     }
 
 }

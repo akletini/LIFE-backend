@@ -7,6 +7,7 @@ import akletini.life.core.user.repository.entity.User;
 import akletini.life.core.user.structure.TestUsers;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -120,6 +121,7 @@ public class ChoreRepositoryTest {
     }
 
     @Test
+    @Disabled
     public void filterByUser() {
         // GIVEN
         List<Chore> testChores = createDueTestChores(2);

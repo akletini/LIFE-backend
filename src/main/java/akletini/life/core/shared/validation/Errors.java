@@ -8,6 +8,7 @@ public class Errors {
     // Misc
     public static final String ENTITY_NOT_FOUND = "entityNotFound";
     public static final String COULD_NOT_STORE = "couldNotStore";
+    public static final String ENTITY_IS_NULL = "entityIsNull";
 
     public interface USER {
         String INVALID_TOKEN_CONTAINER = "invalidTokenContainer";

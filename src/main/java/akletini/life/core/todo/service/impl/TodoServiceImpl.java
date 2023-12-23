@@ -3,8 +3,8 @@ package akletini.life.core.todo.service.impl;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.ValidationRule;
-import akletini.life.core.todo.exception.TodoNotFoundException;
-import akletini.life.core.todo.exception.TodoStoreException;
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TodoRepository;
 import akletini.life.core.todo.repository.entity.Todo;
 import akletini.life.core.todo.service.api.GoogleTaskService;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static akletini.life.core.shared.constants.FilterConstants.*;
-import static akletini.life.core.shared.validation.Errors.COULD_NOT_STORE;
 import static akletini.life.core.shared.validation.Errors.ENTITY_NOT_FOUND;
 
 @Service
@@ -45,7 +44,7 @@ public class TodoServiceImpl implements TodoService {
         validationRules.forEach(rule -> {
             Optional<String> error = rule.validate(todo);
             if (error.isPresent()) {
-                TodoStoreException todoStoreException = new TodoStoreException(error.get());
+                InvalidDataException todoStoreException = new InvalidDataException(error.get());
                 log.error(todoStoreException);
                 throw todoStoreException;
             }
@@ -55,18 +54,12 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo store(Todo todo) {
-        if (todo != null) {
-            validate(todo);
+        validate(todo);
 //            if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
 //                googleTaskService.storeTask(todo);
 //            }
-            return todoRepository.save(todo);
-        }
-        TodoStoreException exception =
-                new TodoStoreException(Errors.getError(COULD_NOT_STORE,
-                        Todo.class.getSimpleName()));
-        log.error(exception);
-        throw exception;
+        return todoRepository.save(todo);
+
     }
 
     @Override
@@ -81,8 +74,8 @@ public class TodoServiceImpl implements TodoService {
     public Todo getById(Long id) {
         return todoRepository.findById(id)
                 .orElseThrow(() -> {
-                    TodoNotFoundException exception =
-                            new TodoNotFoundException(Errors.getError(ENTITY_NOT_FOUND,
+                    EntityNotFoundException exception =
+                            new EntityNotFoundException(Errors.getError(ENTITY_NOT_FOUND,
                                     Todo.class.getSimpleName(), id));
                     log.error(exception);
                     return exception;

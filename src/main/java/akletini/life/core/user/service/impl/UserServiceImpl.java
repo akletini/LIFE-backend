@@ -3,8 +3,8 @@ package akletini.life.core.user.service.impl;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.ValidationRule;
-import akletini.life.core.user.exception.UserNotFoundException;
-import akletini.life.core.user.exception.UserStoreException;
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.user.repository.api.UserRepository;
 import akletini.life.core.user.repository.entity.User;
 import akletini.life.core.user.service.api.UserService;
@@ -33,9 +33,9 @@ public class UserServiceImpl implements UserService {
         validationRules.forEach(rule -> {
             Optional<String> error = rule.validate(user);
             if (error.isPresent()) {
-                UserStoreException userStoreException = new UserStoreException(error.get());
-                log.error(userStoreException);
-                throw userStoreException;
+                InvalidDataException invalidDataException = new InvalidDataException(error.get());
+                log.error(invalidDataException);
+                throw invalidDataException;
             }
         });
         return true;
@@ -50,8 +50,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> {
-            UserNotFoundException exception =
-                    new UserNotFoundException(Errors.getError(ENTITY_NOT_FOUND,
+            EntityNotFoundException exception =
+                    new EntityNotFoundException(Errors.getError(ENTITY_NOT_FOUND,
                             User.class.getSimpleName(), id));
             log.error(exception);
             return exception;
