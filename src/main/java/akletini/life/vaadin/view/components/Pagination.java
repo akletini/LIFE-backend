@@ -41,8 +41,8 @@ public class Pagination extends HorizontalLayout {
         firstPage.addClickListener(event -> firstPage());
 
         lastPage = new Button();
+        lastPage.setEnabled(currentPage < totalPages - 1);
         lastPage.setIcon(new Icon(VaadinIcon.ANGLE_DOUBLE_RIGHT));
-        lastPage.setEnabled(currentPage != totalPages);
         lastPage.addClickListener(event -> lastPage());
 
         previous = new Button();
@@ -51,6 +51,7 @@ public class Pagination extends HorizontalLayout {
         previous.addClickListener(event -> previousPage());
 
         next = new Button();
+        next.setEnabled(currentPage < totalPages - 1);
         next.setIcon(new Icon(VaadinIcon.ANGLE_RIGHT));
         next.addClickListener(event -> nextPage());
 

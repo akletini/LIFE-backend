@@ -86,6 +86,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
         datePicker = new DatePicker();
         datePicker.setLocale(Locale.GERMAN);
         Button addTodoButton = new Button("Add");
+        addTodoButton.addClickListener(onCreateTodo(todoGrid));
         createTodoLayout.setWidthFull();
         createTodoLayout.add(input, datePicker, addTodoButton);
 
@@ -121,9 +122,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
         filterLayout.add(newTagButton, stateSelect, tagComboBox, sortSelect);
         filterLayout.setVerticalComponentAlignment(Alignment.END, newTagButton);
         filterLayout.setWidthFull();
-        filterLayout.setAlignItems(Alignment.START);
-
-        addTodoButton.addClickListener(onCreateTodo(todoGrid));
+        filterLayout.setJustifyContentMode(JustifyContentMode.END);
 
         configureTodoEditor();
         configureTagEditor();
@@ -148,9 +147,8 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                 todo.setState(Todo.State.OPEN);
                 todo.setCreatedAt(LocalDateTime.now());
                 todo.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
-                TodoDto stored = todoService.store(todo);
-                todos.add(stored);
-                todoGrid.setItems(todos.stream().toList());
+                todoService.store(todo);
+                query();
                 datePicker.clear();
                 input.clear();
             }
@@ -190,7 +188,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                     .set("color", color)
                     .set("border-color", color);
             layout.setClassName("dueBox");
-            layout.setWidth(65, Unit.PERCENTAGE);
+            layout.setWidth(9, Unit.REM);
             layout.setVerticalComponentAlignment(Alignment.CENTER, component, icon);
             return layout;
         }).setHeader(

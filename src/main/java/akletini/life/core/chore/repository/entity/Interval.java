@@ -12,14 +12,29 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 public class Interval {
-    
+
     private int value;
     @Enumerated(EnumType.STRING)
     private DateUnit unit;
 
     public enum DateUnit {
-        DAYS,
-        WEEKS,
-        MONTHS,
+        DAYS("Days"),
+        WEEKS("Weeks"),
+        MONTHS("Months");
+
+        private String value;
+
+        DateUnit(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return value + " " + unit.getValue();
     }
 }

@@ -14,7 +14,7 @@ public interface UserMapper {
     @Mapping(target = "role", ignore = true)
     User dtoToUser(UserDto userDto);
 
-    @Mapping(source = "tokens", target = "jwtToken", qualifiedByName = "getToken")
+    //    @Mapping(source = "tokens", target = "jwtToken", qualifiedByName = "getToken")
     @Mapping(target = "password", ignore = true)
     UserDto userToDto(User user);
 
