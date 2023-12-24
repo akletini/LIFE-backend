@@ -1,12 +1,14 @@
 package akletini.life.vaadin.view.todo;
 
 import akletini.life.core.shared.constants.SortingConstants;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.dto.TagDto;
 import akletini.life.core.todo.dto.TodoDto;
 import akletini.life.core.todo.repository.entity.Todo;
 import akletini.life.vaadin.service.todo.ExposedTagService;
 import akletini.life.vaadin.service.todo.ExposedTodoService;
 import akletini.life.vaadin.view.MainView;
+import akletini.life.vaadin.view.components.ErrorModal;
 import akletini.life.vaadin.view.components.PagedGridView;
 import akletini.life.vaadin.view.components.Pagination;
 import com.vaadin.flow.component.ClickEvent;
@@ -147,10 +149,14 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                 todo.setState(Todo.State.OPEN);
                 todo.setCreatedAt(LocalDateTime.now());
                 todo.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
-                todoService.store(todo);
-                query();
-                datePicker.clear();
-                input.clear();
+                try {
+                    todoService.store(todo);
+                    query();
+                    datePicker.clear();
+                    input.clear();
+                } catch (InvalidDataException e) {
+                    add(new ErrorModal(e.getMessage()));
+                }
             }
         };
     }
@@ -228,10 +234,14 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                             ButtonVariant.LUMO_SUCCESS,
                             ButtonVariant.LUMO_TERTIARY);
                     button.addClickListener(e -> {
-                        todoDto.setState(Todo.State.DONE);
-                        TodoDto storedTodo = todoService.store(todoDto);
-                        todos.set(todos.indexOf(todoDto), storedTodo);
-                        todoGrid.setItems(todos.stream().toList());
+                        try {
+                            todoDto.setState(Todo.State.DONE);
+                            TodoDto storedTodo = todoService.store(todoDto);
+                            todos.set(todos.indexOf(todoDto), storedTodo);
+                            todoGrid.setItems(todos.stream().toList());
+                        } catch (InvalidDataException ex) {
+                            add(new ErrorModal(ex.getMessage()));
+                        }
                     });
                     button.setIcon(new Icon(VaadinIcon.CHECK));
                 })
@@ -308,17 +318,21 @@ public class TodoView extends VerticalLayout implements PagedGridView {
     }
 
     private void saveTag(TagEditor.SaveEvent saveEvent) {
-        tagService.store(saveEvent.getTag());
-        List<TagDto> allTags = tagService.getAll();
-        tagComboBox.setItems(allTags);
-        todoEditor.tag.setItems(allTags);
-        todos.forEach(todo -> {
-            if (todo.getTag() != null && saveEvent.getTag().getId().equals(todo.getTag().getId())) {
-                todo.setTag(saveEvent.getTag());
-            }
-        });
-        todoGrid.setItems(todos);
-        tagEditor.setCreateVisible(false);
+        try {
+            tagService.store(saveEvent.getTag());
+            List<TagDto> allTags = tagService.getAll();
+            tagComboBox.setItems(allTags);
+            todoEditor.tag.setItems(allTags);
+            todos.forEach(todo -> {
+                if (todo.getTag() != null && saveEvent.getTag().getId().equals(todo.getTag().getId())) {
+                    todo.setTag(saveEvent.getTag());
+                }
+            });
+            todoGrid.setItems(todos);
+            tagEditor.setCreateVisible(false);
+        } catch (InvalidDataException e) {
+            add(new ErrorModal(e.getMessage()));
+        }
     }
 
     private void deleteTag(TagEditor.DeleteEvent deleteEvent) {
@@ -337,9 +351,14 @@ public class TodoView extends VerticalLayout implements PagedGridView {
 
     private void saveTodo(TodoEditor.SaveEvent saveEvent) {
         TodoDto todoDto = saveEvent.getTodo();
-        TodoDto storedTodo = todoService.store(todoDto);
-        todos.set(todos.indexOf(todoDto), storedTodo);
-        todoGrid.setItems(todos.stream().toList());
-        todoEditor.setVisible(false);
+        TodoDto storedTodo = null;
+        try {
+            storedTodo = todoService.store(todoDto);
+            todos.set(todos.indexOf(todoDto), storedTodo);
+            todoGrid.setItems(todos.stream().toList());
+            todoEditor.setVisible(false);
+        } catch (InvalidDataException e) {
+            add(new ErrorModal(e.getMessage()));
+        }
     }
 }

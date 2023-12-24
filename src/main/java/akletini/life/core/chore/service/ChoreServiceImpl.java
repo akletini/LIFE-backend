@@ -6,10 +6,6 @@ import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.repository.entity.Interval;
 import akletini.life.core.shared.constants.FilterConstants;
 import akletini.life.core.shared.utils.DateUtils;
-import akletini.life.core.shared.validation.EntityValidation;
-import akletini.life.core.shared.validation.Errors;
-import akletini.life.core.shared.validation.ValidationRule;
-import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.core.shared.validation.exception.InvalidDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,10 +20,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 @Log4j2
-public class ChoreServiceImpl implements ChoreService {
+public class ChoreServiceImpl extends ChoreService {
     private ChoreRepository choreRepository;
-
-    private EntityValidation<Chore> validation;
 
     @Override
     public Page<Chore> getChores(int page, int pageSize, Optional<String> sortBy,
@@ -46,7 +40,7 @@ public class ChoreServiceImpl implements ChoreService {
     }
 
     @Override
-    public Chore completeChore(Chore chore) {
+    public Chore completeChore(Chore chore) throws InvalidDataException {
         validate(chore);
         if (chore.isShiftInterval()) {
             chore.setDueAt(DateUtils.dateToLocalDate(computeDueDate(chore.getId(), new Date(),
@@ -61,45 +55,13 @@ public class ChoreServiceImpl implements ChoreService {
     }
 
     @Override
-    public boolean validate(Chore chore) {
-        List<ValidationRule<Chore>> validationRules = validation.getValidationRules();
-        validationRules.forEach(rule -> {
-            Optional<String> error = rule.validate(chore);
-            if (error.isPresent()) {
-                InvalidDataException exception = new InvalidDataException(error.get());
-                log.error(exception);
-                throw exception;
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public Chore store(Chore chore) {
+    public Chore store(Chore chore) throws InvalidDataException {
         validate(chore);
         Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getId(),
                 DateUtils.localDateToDate(chore.getStartDate()), chore.getInterval()) :
                 DateUtils.localDateToDate(chore.getStartDate());
         chore.setDueAt(DateUtils.dateToLocalDate(dueDate));
         return choreRepository.save(chore);
-    }
-
-    @Override
-    public Chore getById(Long id) {
-        log.info("Searching chore with id {}", id);
-        return choreRepository.findById(id).orElseThrow(() -> {
-            EntityNotFoundException exception =
-                    new EntityNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
-                            Chore.class.getSimpleName(), id));
-            log.error(exception);
-            return exception;
-        });
-    }
-
-    @Override
-    public void delete(Chore chore) {
-        log.info("Deleting chore with id {}", chore.getId());
-        choreRepository.delete(chore);
     }
 
     private Date computeDueDate(Long choreId, Date startDate, Interval interval) {

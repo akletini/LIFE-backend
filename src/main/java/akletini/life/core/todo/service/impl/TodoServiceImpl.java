@@ -1,8 +1,5 @@
 package akletini.life.core.todo.service.impl;
 
-import akletini.life.core.shared.validation.EntityValidation;
-import akletini.life.core.shared.validation.Errors;
-import akletini.life.core.shared.validation.ValidationRule;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TodoRepository;
@@ -24,36 +21,20 @@ import java.util.List;
 import java.util.Optional;
 
 import static akletini.life.core.shared.constants.FilterConstants.*;
-import static akletini.life.core.shared.validation.Errors.ENTITY_NOT_FOUND;
 
 @Service
 @AllArgsConstructor
 @Log4j2
-public class TodoServiceImpl implements TodoService {
+public class TodoServiceImpl extends TodoService {
     private GoogleTaskService googleTaskService;
 
     private TodoRepository todoRepository;
 
-    private EntityValidation<Todo> validation;
-
     private TagService tagService;
 
-    @Override
-    public boolean validate(Todo todo) {
-        List<ValidationRule<Todo>> validationRules = validation.getValidationRules();
-        validationRules.forEach(rule -> {
-            Optional<String> error = rule.validate(todo);
-            if (error.isPresent()) {
-                InvalidDataException todoStoreException = new InvalidDataException(error.get());
-                log.error(todoStoreException);
-                throw todoStoreException;
-            }
-        });
-        return true;
-    }
 
     @Override
-    public Todo store(Todo todo) {
+    public Todo store(Todo todo) throws InvalidDataException {
         validate(todo);
 //            if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
 //                googleTaskService.storeTask(todo);
@@ -71,18 +52,6 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public Todo getById(Long id) {
-        return todoRepository.findById(id)
-                .orElseThrow(() -> {
-                    EntityNotFoundException exception =
-                            new EntityNotFoundException(Errors.getError(ENTITY_NOT_FOUND,
-                                    Todo.class.getSimpleName(), id));
-                    log.error(exception);
-                    return exception;
-                });
-    }
-
-    @Override
     public Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
                                Optional<String> filterBy, Optional<List<String>> tags) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
@@ -94,7 +63,13 @@ public class TodoServiceImpl implements TodoService {
             List<String> filters =
                     filterBy.map(Collections::singletonList).orElse(Collections.emptyList());
             List<Long> tagIds = new ArrayList<>();
-            tags.ifPresent(strings -> strings.forEach(tagName -> tagIds.add(tagService.getByName(tagName).getId())));
+            tags.ifPresent(strings -> strings.forEach(tagName -> {
+                try {
+                    tagIds.add(tagService.getByName(tagName).getId());
+                } catch (EntityNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
             return todoRepository.findFiltered(pageRequest,
                     filters.contains(OPEN) ? Todo.State.OPEN : null,
                     filters.contains(DUE) ? LocalDate.now() : null,

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Interval {
 
-    private int value;
+    private Integer value;
     @Enumerated(EnumType.STRING)
     private DateUnit unit;
 

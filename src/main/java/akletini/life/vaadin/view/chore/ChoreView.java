@@ -2,9 +2,10 @@ package akletini.life.vaadin.view.chore;
 
 import akletini.life.core.chore.dto.ChoreDto;
 import akletini.life.core.shared.constants.SortingConstants;
-import akletini.life.vaadin.service.chore.ChoreEditor;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.vaadin.service.chore.ExposedChoreService;
 import akletini.life.vaadin.view.MainView;
+import akletini.life.vaadin.view.components.ErrorModal;
 import akletini.life.vaadin.view.components.PagedGridView;
 import akletini.life.vaadin.view.components.Pagination;
 import com.vaadin.flow.component.Component;
@@ -51,9 +52,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
     private DatePicker datePicker;
     private Button addChoreButton;
     private ExposedChoreService choreService;
-
     private Page<ChoreDto> chores;
-
     private final Grid<ChoreDto> choreGrid;
     private final Pagination pagination;
     private int currentPage = 0;
@@ -61,6 +60,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
     private Select<String> sortSelect;
     private MultiSelectComboBox<String> filterSelect;
     private ChoreEditor choreEditor;
+    private Button newChoreButton;
 
     public ChoreView(ExposedChoreService choreService) {
         this.choreService = choreService;
@@ -68,13 +68,13 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
         H1 title = new H1("Chore page");
         choreGrid = new Grid<>();
         initializeGrid(choreGrid);
-        HorizontalLayout inputLayout = createInputLayout();
+//        HorizontalLayout inputLayout = createInputLayout();
         HorizontalLayout filterLayout = createFilterLayout();
         pagination = new Pagination(pageSize, chores.getTotalPages());
         pagination.addQueryListener(event -> query());
         configureEditor();
 
-        add(getEditorLayout(new VerticalLayout(title, inputLayout, filterLayout, choreGrid,
+        add(getEditorLayout(new VerticalLayout(title, filterLayout, choreGrid,
                 pagination)));
     }
 
@@ -88,6 +88,11 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
 
     private HorizontalLayout createFilterLayout() {
         HorizontalLayout filterLayout = new HorizontalLayout();
+        newChoreButton = new Button("New chore");
+        newChoreButton.addClickListener(event -> {
+            choreEditor.setEditorVisible(new ChoreDto(), true);
+        });
+        newChoreButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         filterSelect = new MultiSelectComboBox<>();
         filterSelect.setLabel("Filter: ");
         filterSelect.setItems(List.of(ACTIVE, DUE));
@@ -100,8 +105,9 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
         filterLayout.setJustifyContentMode(JustifyContentMode.END);
         filterLayout.setPadding(true);
         filterLayout.setWidthFull();
+        filterLayout.setVerticalComponentAlignment(Alignment.END, newChoreButton);
 
-        filterLayout.add(filterSelect, sortSelect);
+        filterLayout.add(newChoreButton, filterSelect, sortSelect);
         return filterLayout;
     }
 
@@ -114,17 +120,23 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
         titleInput.setRequiredIndicatorVisible(true);
         datePicker = new DatePicker();
         datePicker.setLocale(Locale.GERMAN);
+        datePicker.setValue(LocalDate.now());
         addChoreButton = new Button("Add");
         addChoreButton.addClickListener(event -> {
             if (!StringUtils.isEmpty(titleInput.getValue())) {
                 ChoreDto choreDto = new ChoreDto();
                 choreDto.setTitle(titleInput.getValue());
                 choreDto.setCreatedAt(LocalDateTime.now());
+                choreDto.setStartDate(LocalDate.now());
                 choreDto.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
-                choreService.store(choreDto);
-                query();
-                datePicker.clear();
-                titleInput.clear();
+                try {
+                    choreService.store(choreDto);
+                    query();
+                    datePicker.clear();
+                    titleInput.clear();
+                } catch (InvalidDataException e) {
+                    add(new ErrorModal(e.getMessage()));
+                }
             }
         });
         createTodoLayout.setWidthFull();
@@ -179,13 +191,19 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
             complete.addThemeVariants(ButtonVariant.LUMO_ICON,
                     ButtonVariant.LUMO_SUCCESS,
                     ButtonVariant.LUMO_TERTIARY);
-            complete.addClickListener(event -> choreService.completeChore(choreDto));
+            complete.addClickListener(event -> {
+                try {
+                    choreService.completeChore(choreDto);
+                } catch (InvalidDataException e) {
+                    add(new ErrorModal(e.getMessage()));
+                }
+            });
             complete.setIcon(new Icon(VaadinIcon.CHECK));
             Button edit = new Button();
             edit.addThemeVariants(ButtonVariant.LUMO_ICON,
                     ButtonVariant.LUMO_TERTIARY);
             edit.setIcon(new Icon(VaadinIcon.EDIT));
-            edit.addClickListener(event -> choreEditor.setEditorVisible(choreDto));
+            edit.addClickListener(event -> choreEditor.setEditorVisible(choreDto, false));
             Button delete = new Button();
             delete.addThemeVariants(ButtonVariant.LUMO_ICON,
                     ButtonVariant.LUMO_ERROR,
@@ -203,11 +221,22 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
         choreEditor.setWidth("25em");
         choreEditor.setVisible(false);
         choreEditor.addSaveListener(this::saveChore);
+        choreEditor.addDeleteListener(this::deleteChore);
     }
 
     private void saveChore(ChoreEditor.SaveEvent saveEvent) {
+        try {
+            choreService.store(saveEvent.getChore());
+            choreEditor.setVisible(false);
+            query();
+        } catch (InvalidDataException e) {
+            add(new ErrorModal(e.getMessage()));
+        }
+    }
+
+    private void deleteChore(ChoreEditor.DeleteEvent deleteEvent) {
         choreEditor.setVisible(false);
-        choreService.store(saveEvent.getChore());
+        choreService.delete(deleteEvent.getChore());
         query();
     }
 

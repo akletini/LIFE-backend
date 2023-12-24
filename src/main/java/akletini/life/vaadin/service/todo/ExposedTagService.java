@@ -1,5 +1,6 @@
 package akletini.life.vaadin.service.todo;
 
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.dto.TagDto;
 import akletini.life.core.todo.dto.mapper.TagMapper;
 import akletini.life.core.todo.repository.entity.Tag;
@@ -21,7 +22,7 @@ public class ExposedTagService {
         this.tagService = tagService;
     }
 
-    public TagDto store(TagDto tagDto) {
+    public TagDto store(TagDto tagDto) throws InvalidDataException {
         Tag tag = tagMapper.dtoToTag(tagDto);
         Tag storedTag = tagService.store(tag);
         return tagMapper.tagToDto(storedTag);

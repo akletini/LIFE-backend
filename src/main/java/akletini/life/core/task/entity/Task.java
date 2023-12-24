@@ -1,5 +1,6 @@
 package akletini.life.core.task.entity;
 
+import akletini.life.core.shared.BaseEntity;
 import akletini.life.core.user.repository.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,13 +13,8 @@ import java.time.LocalDateTime;
 @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class Task {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+@MappedSuperclass
+public class Task extends BaseEntity {
 
     @NonNull
     protected String title;

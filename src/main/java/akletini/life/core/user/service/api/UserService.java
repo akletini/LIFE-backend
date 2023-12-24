@@ -3,11 +3,7 @@ package akletini.life.core.user.service.api;
 import akletini.life.core.shared.EntityService;
 import akletini.life.core.user.repository.entity.User;
 
-import java.util.List;
+public abstract class UserService extends EntityService<User> {
 
-public interface UserService extends EntityService<User> {
-
-    User getByEmail(String email);
-
-    List<User> getAll();
+    public abstract User getByEmail(String email);
 }

@@ -14,14 +14,14 @@ public class ChoreDto {
 
     private Long id;
     private String title;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDate dueAt;
     private String description;
-    private LocalDate startDate;
+    private LocalDate startDate = LocalDate.now();
     private LocalDate lastCompleted;
-    private boolean active;
+    private boolean active = true;
     private boolean shiftInterval;
-    private int duration;
-    private Interval interval;
+    private Integer duration;
+    private Interval interval = new Interval();
     private UserDto assignedUser;
 }

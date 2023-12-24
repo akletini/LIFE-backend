@@ -30,10 +30,8 @@ public class Chore extends Task {
     private boolean shiftInterval;
 
     // duration in minutes;
-    @NonNull
     private Integer duration;
 
-    @NonNull
     private Interval interval;
 
     @Override

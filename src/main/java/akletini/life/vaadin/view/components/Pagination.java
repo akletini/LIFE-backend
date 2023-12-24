@@ -132,8 +132,8 @@ public class Pagination extends HorizontalLayout {
     }
 
     public static class PaginationEvent extends ComponentEvent<Pagination> {
-        private int page;
-        private int pageSize;
+        private final int page;
+        private final int pageSize;
 
         protected PaginationEvent(Pagination source, int page, int pageSize) {
             super(source, false);

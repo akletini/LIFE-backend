@@ -1,5 +1,6 @@
 package akletini.life.core.todo.service.impl;
 
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.core.todo.repository.entity.Todo;
 import akletini.life.core.todo.service.api.GoogleTaskService;
 import akletini.life.core.todo.service.api.TodoService;
@@ -59,7 +60,8 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     @Lazy
     private TodoService todoService;
 
-    private static final String CREDENTIAL_PATH = "spring.security.oauth2.client.registration.google";
+    private static final String CREDENTIAL_PATH = "spring.security.oauth2.client.registration" +
+            ".google";
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
@@ -72,7 +74,8 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
-            Tasks service = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(todo, HTTP_TRANSPORT))
+            Tasks service = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(todo,
+                    HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
 
@@ -84,7 +87,7 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
             log.info("Creating Google task {}", todo.getTitle());
 
             insertTask(todo, service);
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException | GeneralSecurityException | EntityNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -101,7 +104,7 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
     }
 
     @Async
-    private void updateTodo(Todo todo, Tasks service) throws IOException {
+    private void updateTodo(Todo todo, Tasks service) throws IOException, EntityNotFoundException {
         var tasks = service.tasks().list(TODO_TASK_ID).execute();
         List<Task> taskList = tasks.getItems();
         Task currentTask = new Task();
@@ -131,7 +134,8 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
-            Tasks service = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(todo, HTTP_TRANSPORT))
+            Tasks service = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(todo,
+                    HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
             var tasks = service.tasks().list(TODO_TASK_ID).execute();
@@ -148,15 +152,14 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
             }
 
             service.tasks().delete(TODO_TASK_ID, currentTask.getId()).execute();
-        } catch (IOException |
-                 GeneralSecurityException e) {
+        } catch (IOException | GeneralSecurityException | EntityNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
 
     @SuppressWarnings("deprecation")
-    private Credential getCredentials(Todo todo, HttpTransport transport) {
+    private Credential getCredentials(Todo todo, HttpTransport transport) throws EntityNotFoundException {
         String accessToken;
         try {
             accessToken = checkTokenValidity(todo);
@@ -167,7 +170,8 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
 
         todo.getAssignedUser().getTokenContainer().setAccessToken(accessToken);
         Credential credential = new GoogleCredential.Builder()
-                .setClientSecrets(env.getProperty(CREDENTIAL_PATH + ".client-id"), env.getProperty(CREDENTIAL_PATH + ".client-secret"))
+                .setClientSecrets(env.getProperty(CREDENTIAL_PATH + ".client-id"),
+                        env.getProperty(CREDENTIAL_PATH + ".client-secret"))
                 .setTransport(transport)
                 .setJsonFactory(JSON_FACTORY)
                 .build();
@@ -175,11 +179,12 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
         return credential;
     }
 
-    private String checkTokenValidity(Todo todo) {
+    private String checkTokenValidity(Todo todo) throws EntityNotFoundException {
         String accessToken;
         User user = todo.getAssignedUser();
         user = userService.getById(user.getId());
-        SimpleDateFormat sdf = new SimpleDateFormat(akletini.life.core.shared.utils.DateUtils.DATE_TIME_FORMAT);
+        SimpleDateFormat sdf =
+                new SimpleDateFormat(akletini.life.core.shared.utils.DateUtils.DATE_TIME_FORMAT);
         TokenContainer tokenContainer = user.getTokenContainer();
         Date accessTokenCreation;
         try {
@@ -225,8 +230,10 @@ public class GoogleTaskServiceImpl implements GoogleTaskService {
             HttpPost post = new HttpPost("https://www.googleapis.com/oauth2/v4/token");
 
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("client_id", env.getProperty(CREDENTIAL_PATH + ".client-id")));
-            params.add(new BasicNameValuePair("client_secret", env.getProperty(CREDENTIAL_PATH + ".client-secret")));
+            params.add(new BasicNameValuePair("client_id", env.getProperty(CREDENTIAL_PATH +
+                    ".client-id")));
+            params.add(new BasicNameValuePair("client_secret", env.getProperty(CREDENTIAL_PATH +
+                    ".client-secret")));
             params.add(new BasicNameValuePair("refresh_token", tokenContainer.getRefreshToken()));
             params.add(new BasicNameValuePair("grant_type", "refresh_token"));
             post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));

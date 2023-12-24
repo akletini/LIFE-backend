@@ -7,9 +7,10 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Optional;
 
-public interface TodoService extends EntityService<Todo> {
+public abstract class TodoService extends EntityService<Todo> {
 
-    Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
-                        Optional<String> filterBy, Optional<List<String>> tags);
+
+    public abstract Page<Todo> getTodos(int page, int pageSize, Optional<String> sortBy,
+                                        Optional<String> filterBy, Optional<List<String>> tags);
 
 }

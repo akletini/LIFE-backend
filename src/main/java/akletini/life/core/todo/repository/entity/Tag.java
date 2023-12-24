@@ -1,5 +1,6 @@
 package akletini.life.core.todo.repository.entity;
 
+import akletini.life.core.shared.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "tags")
-public class Tag implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class Tag extends BaseEntity implements Serializable {
 
     @Column(unique = true)
     private String name;

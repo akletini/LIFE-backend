@@ -1,6 +1,7 @@
 package akletini.life.core.user.repository.entity;
 
 import akletini.life.core.chore.repository.entity.Chore;
+import akletini.life.core.shared.BaseEntity;
 import akletini.life.core.todo.repository.entity.Todo;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,11 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Long id;
+public class User extends BaseEntity {
 
     private String name;
     @Column(unique = true)

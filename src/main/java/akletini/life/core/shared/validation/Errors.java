@@ -9,6 +9,7 @@ public class Errors {
     public static final String ENTITY_NOT_FOUND = "entityNotFound";
     public static final String COULD_NOT_STORE = "couldNotStore";
     public static final String ENTITY_IS_NULL = "entityIsNull";
+    public static final String ENTITY_NOT_FOUND_BY_NAME = "entityNotFoundByName";
 
     public interface USER {
         String INVALID_TOKEN_CONTAINER = "invalidTokenContainer";
@@ -26,6 +27,10 @@ public class Errors {
         String CREATED_DATE_UNCHANGED = "createdDateUnchanged";
 
         String ASSIGNED_USER_MATCH = "assignedUserMatch";
+    }
+
+    public interface TAG {
+        String TAG_NAME_UNIQUE = "tagNameUnique";
     }
 
 

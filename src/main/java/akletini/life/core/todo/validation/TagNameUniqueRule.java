@@ -1,7 +1,7 @@
 package akletini.life.core.todo.validation;
 
+import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.ValidationRule;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TagRepository;
 import akletini.life.core.todo.repository.entity.Tag;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class TagNameUniqueRule implements ValidationRule<Tag> {
         Optional<Tag> getByName = tagRepository.findByName(tag.getName());
         if (getByName.isPresent()) {
             if (!Objects.equals(getByName.get().getId(), tag.getId())) {
-                throw new InvalidDataException("Tag name is not unique");
+                return Optional.of(Errors.getError(Errors.TAG.TAG_NAME_UNIQUE));
             }
         }
         return Optional.empty();

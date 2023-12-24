@@ -1,5 +1,7 @@
 package akletini.life.core.user.controller;
 
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.user.dto.UserDto;
 import akletini.life.core.user.dto.mapper.UserMapper;
 import akletini.life.core.user.repository.entity.User;
@@ -17,13 +19,13 @@ public class UserController {
     private final UserMapper userMapper;
 
     @PostMapping("/add")
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) throws InvalidDataException {
         User storedUser = userService.store(userMapper.dtoToUser(userDto));
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(storedUser));
     }
 
     @PutMapping(value = "/update")
-    public ResponseEntity<UserDto> updateTodo(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateTodo(@RequestBody UserDto userDto) throws EntityNotFoundException, InvalidDataException {
         User user = userMapper.dtoToUser(userDto);
         userService.getById(user.getId());
         User updatedUser = userService.store(user);
@@ -37,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getById(@PathVariable Long id) throws EntityNotFoundException {
         User user = userService.getById(id);
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.userToDto(user));
     }
