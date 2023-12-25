@@ -4,6 +4,7 @@ import akletini.life.core.chore.repository.api.ChoreRepository;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.repository.entity.Interval;
 import akletini.life.core.chore.service.ChoreService;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.user.ContextUtils;
 import akletini.life.core.user.repository.api.UserRepository;
@@ -79,7 +80,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void cannotModifyUser() throws InvalidDataException {
+    public void cannotModifyUser() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             // GIVEN
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
@@ -99,7 +100,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void sameDueDateAfterOtherModification() throws InvalidDataException {
+    public void sameDueDateAfterOtherModification() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             // GIVEN
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
@@ -120,7 +121,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithShift() throws InvalidDataException {
+    public void completeWithShift() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given chore with due date today
@@ -140,7 +141,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithShiftTooEarly() throws InvalidDataException {
+    public void completeWithShiftTooEarly() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given chore with due date today
@@ -160,7 +161,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithShiftTooLate() throws InvalidDataException {
+    public void completeWithShiftTooLate() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given chore with due date today
@@ -180,7 +181,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithoutShift() throws InvalidDataException {
+    public void completeWithoutShift() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();
@@ -198,7 +199,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithoutShiftTooEarly() throws InvalidDataException {
+    public void completeWithoutShiftTooEarly() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();
@@ -216,7 +217,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void completeWithoutShiftTooLate() throws InvalidDataException {
+    public void completeWithoutShiftTooLate() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();
@@ -246,7 +247,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void testStartDate() throws InvalidDataException {
+    public void testStartDate() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();
@@ -272,7 +273,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void correctDueDateWeeks() throws InvalidDataException {
+    public void correctDueDateWeeks() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();
@@ -291,7 +292,7 @@ public class ChoreServiceTest {
     }
 
     @Test
-    public void correctDueDateMonths() throws InvalidDataException {
+    public void correctDueDateMonths() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             Chore chore = TestChores.getNewChore();

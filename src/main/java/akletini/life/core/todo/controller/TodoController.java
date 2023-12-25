@@ -1,8 +1,8 @@
 package akletini.life.core.todo.controller;
 
 import akletini.life.core.shared.response.HttpResponse;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.dto.TodoDto;
 import akletini.life.core.todo.dto.mapper.TodoMapper;
 import akletini.life.core.todo.repository.entity.Todo;
@@ -29,14 +29,14 @@ public class TodoController {
     private final TodoMapper todoMapper;
 
     @PostMapping(value = "/add")
-    public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) throws InvalidDataException {
+    public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) throws BusinessException {
         Todo todo = todoMapper.dtoToTodo(todoDto);
         Todo storedTodo = todoService.store(todo);
         return ResponseEntity.status(OK).body(todoMapper.todoToDto(storedTodo));
     }
 
     @PutMapping(value = "/update")
-    public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto) throws EntityNotFoundException, InvalidDataException {
+    public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto) throws BusinessException {
         Todo todo = todoMapper.dtoToTodo(todoDto);
         todoService.getById(todo.getId());
         Todo updatedtodo = todoService.store(todo);

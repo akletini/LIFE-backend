@@ -1,17 +1,20 @@
 package akletini.life.core.product.repository.entity;
 
-import akletini.life.core.shared.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotNull;
+import akletini.life.core.product.repository.entity.converter.AttributeListConverter;
+import akletini.life.core.shared.NamedEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static akletini.life.core.shared.utils.DateUtils.LOCAL_DATE_TIME_FORMAT;
 
 @Getter
 @Setter
@@ -19,14 +22,24 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "products")
-public class Product extends BaseEntity {
+@Document(indexName = "products")
+public class Product extends NamedEntity {
 
-    @NotNull
+    @Field(type = FieldType.Keyword)
     private String name;
+    @Field(type = FieldType.Text)
     private String description;
-    @NotNull
+    @Field(type = FieldType.Date, format = {}, pattern = LOCAL_DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
+    @Field(type = FieldType.Nested)
     private Quantity quantity;
-    @Transient
+
+    @ManyToOne
+    @JoinColumn(name = "product_type_id")
+    private ProductType productType;
+    @Field(type = FieldType.Nested, includeInParent = true)
+    @Convert(converter = AttributeListConverter.class)
+    @Column(columnDefinition = "TEXT")
     private List<Attribute> attributes;
+
 }

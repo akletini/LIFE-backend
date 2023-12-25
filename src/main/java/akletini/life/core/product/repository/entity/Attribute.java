@@ -1,14 +1,13 @@
 package akletini.life.core.product.repository.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Attribute {
+    private AttributeType attributeType;
     private String value;
-
-    private BasicType basicType;
 }

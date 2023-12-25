@@ -20,6 +20,8 @@ public class Quantity {
     @Enumerated(EnumType.STRING)
     private QuantityDescription quantityUnit;
 
+    private String quantityUnitKey;
+
     public enum QuantityDescription {
         PIECE,
         WEIGHT,
@@ -30,6 +32,7 @@ public class Quantity {
         private final Map<String, Double> quantityMapping = new HashMap<>();
 
         public void setUnit(String unit) {
+            quantityMapping.clear();
             this.unit = unit;
             if (this.equals(PIECE)) {
                 quantityMapping.put("Piece", 1.0);

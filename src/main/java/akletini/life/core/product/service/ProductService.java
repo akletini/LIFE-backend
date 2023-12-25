@@ -6,6 +6,5 @@ import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 
 public abstract class ProductService extends EntityService<Product> {
 
-
-    abstract Product getByName(String name) throws EntityNotFoundException;
+    protected abstract Product getByName(String name) throws EntityNotFoundException;
 }

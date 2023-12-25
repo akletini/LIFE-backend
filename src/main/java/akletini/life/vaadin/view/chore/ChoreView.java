@@ -2,7 +2,7 @@ package akletini.life.vaadin.view.chore;
 
 import akletini.life.core.chore.dto.ChoreDto;
 import akletini.life.core.shared.constants.SortingConstants;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.vaadin.service.chore.ExposedChoreService;
 import akletini.life.vaadin.view.MainView;
 import akletini.life.vaadin.view.components.ErrorModal;
@@ -134,7 +134,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
                     query();
                     datePicker.clear();
                     titleInput.clear();
-                } catch (InvalidDataException e) {
+                } catch (BusinessException e) {
                     add(new ErrorModal(e.getMessage()));
                 }
             }
@@ -194,7 +194,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
             complete.addClickListener(event -> {
                 try {
                     choreService.completeChore(choreDto);
-                } catch (InvalidDataException e) {
+                } catch (BusinessException e) {
                     add(new ErrorModal(e.getMessage()));
                 }
             });
@@ -229,7 +229,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
             choreService.store(saveEvent.getChore());
             choreEditor.setVisible(false);
             query();
-        } catch (InvalidDataException e) {
+        } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }
     }

@@ -37,6 +37,8 @@ spring:
 springdoc:
   api-docs:
     path: /api-docs
+elastic:
+  url: localhost:9200
 #logging:
 #  level:
 #    org.hibernate.SQL: DEBUG

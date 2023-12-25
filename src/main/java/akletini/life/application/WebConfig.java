@@ -3,8 +3,6 @@ package akletini.life.application;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -13,20 +11,5 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableScheduling
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-        corsRegistry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods(CorsConfiguration.ALL);
-    }
 
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//        config.setAllowedOrigins(List.of("http://localhost:3000", "https://www.thelifeapp.de",
-//                "https://thelifeapp.de"));
-//        source.registerCorsConfiguration("/**", config);
-//        return source;
-//    }
 }

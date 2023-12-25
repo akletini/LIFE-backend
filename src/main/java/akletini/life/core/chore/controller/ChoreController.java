@@ -5,8 +5,8 @@ import akletini.life.core.chore.dto.mapper.ChoreMapper;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.service.ChoreService;
 import akletini.life.core.shared.response.HttpResponse;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.dto.TodoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,13 +32,13 @@ public class ChoreController {
     private final ChoreMapper choreMapper;
 
     @PostMapping("/add")
-    public ResponseEntity<ChoreDto> addChore(@RequestBody ChoreDto choreDto) throws InvalidDataException {
+    public ResponseEntity<ChoreDto> addChore(@RequestBody ChoreDto choreDto) throws BusinessException {
         Chore storedChore = choreService.store(choreMapper.dtoToChore(choreDto));
         return ResponseEntity.status(OK).body(choreMapper.choreToDto(storedChore));
     }
 
     @PutMapping("/complete")
-    public ResponseEntity<ChoreDto> completeChore(@RequestBody ChoreDto choreDto) throws InvalidDataException {
+    public ResponseEntity<ChoreDto> completeChore(@RequestBody ChoreDto choreDto) throws BusinessException {
         Chore completedChore = choreService.completeChore(choreMapper.dtoToChore(choreDto));
         return ResponseEntity.status(OK).body(choreMapper.choreToDto(completedChore));
     }
@@ -51,7 +51,7 @@ public class ChoreController {
     }
 
     @PutMapping(value = "/update")
-    public ResponseEntity<ChoreDto> updateTodo(@RequestBody ChoreDto choreDto) throws EntityNotFoundException, InvalidDataException {
+    public ResponseEntity<ChoreDto> updateTodo(@RequestBody ChoreDto choreDto) throws BusinessException {
         Chore chore = choreMapper.dtoToChore(choreDto);
         choreService.getById(chore.getId());
         Chore updatedChore = choreService.store(chore);

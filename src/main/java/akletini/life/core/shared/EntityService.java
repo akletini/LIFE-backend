@@ -1,11 +1,10 @@
 package akletini.life.core.shared;
 
-import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.ValidationRule;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +24,21 @@ public abstract class EntityService<T extends BaseEntity> {
     @Autowired
     protected ListCrudRepository<T, Long> entityRepository;
 
-    public boolean validate(T object) throws InvalidDataException {
+
+    public boolean validate(T object) throws BusinessException {
         List<ValidationRule<T>> validationRules = entityValidation.getValidationRules();
         for (ValidationRule<T> rule : validationRules) {
-            Optional<String> error = rule.validate(object);
+            Optional<BusinessException> error = rule.validate(object);
             if (error.isPresent()) {
-                InvalidDataException invalidDataException = new InvalidDataException(error.get());
-                log.error(invalidDataException);
-                throw invalidDataException;
+                BusinessException exception = error.get();
+                log.error(exception);
+                throw exception;
             }
         }
         return true;
     }
 
-    public T store(T object) throws InvalidDataException {
+    public T store(T object) throws BusinessException {
         validate(object);
         log.info("Saving entity {}", object.getClass().getSimpleName());
         return entityRepository.save(object);
@@ -49,7 +49,7 @@ public abstract class EntityService<T extends BaseEntity> {
         return entityRepository.findById(id).orElseThrow(() -> {
             EntityNotFoundException exception =
                     new EntityNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
-                            Chore.class.getSimpleName(), id));
+                            "object", id));
             log.error(exception);
             return exception;
         });

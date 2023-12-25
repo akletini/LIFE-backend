@@ -1,6 +1,6 @@
 package akletini.life.vaadin.service.todo;
 
-import akletini.life.core.shared.validation.exception.InvalidDataException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.todo.dto.TodoDto;
 import akletini.life.core.todo.dto.mapper.TodoMapper;
 import akletini.life.core.todo.repository.entity.Todo;
@@ -27,7 +27,7 @@ public class ExposedTodoService {
         return todos.map(todoMapper::todoToDto);
     }
 
-    public TodoDto store(TodoDto todoDto) throws InvalidDataException {
+    public TodoDto store(TodoDto todoDto) throws BusinessException {
         return todoMapper.todoToDto(todoService.store(todoMapper.dtoToTodo(todoDto)));
     }
 

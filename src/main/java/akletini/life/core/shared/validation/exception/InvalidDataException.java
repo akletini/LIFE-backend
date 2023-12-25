@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class InvalidDataException extends Exception {
+public class InvalidDataException extends BusinessException {
 
     public InvalidDataException(String message) {
         super(message);

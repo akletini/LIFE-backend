@@ -1,10 +1,12 @@
-package akletini.life.core.product.service;
+package akletini.life.core.product.service.impl;
 
-import akletini.life.core.product.repository.api.ProductRepository;
+import akletini.life.core.product.repository.api.product.ProductIndexRepository;
+import akletini.life.core.product.repository.api.product.ProductRepository;
 import akletini.life.core.product.repository.entity.Product;
+import akletini.life.core.product.service.ProductService;
 import akletini.life.core.shared.validation.Errors;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Log4j2
 public class ProductServiceImpl extends ProductService {
-
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    protected ProductIndexRepository entityIndexRepository;
 
     @Override
-    public Product store(Product product) throws InvalidDataException {
-        return super.store(product);
+    public Product store(Product product) throws BusinessException {
+        Product stored = super.store(product);
+        entityIndexRepository.save(product);
+        return stored;
     }
 
     @Override

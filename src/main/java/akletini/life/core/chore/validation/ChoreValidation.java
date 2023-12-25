@@ -1,8 +1,8 @@
 package akletini.life.core.chore.validation;
 
 import akletini.life.core.chore.repository.entity.Chore;
-import akletini.life.core.chore.validation.rules.PositiveIntervalRule;
-import akletini.life.core.chore.validation.rules.StartDateNotInPastRule;
+import akletini.life.core.chore.validation.rule.PositiveIntervalRule;
+import akletini.life.core.chore.validation.rule.StartDateNotInPastRule;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.ValidationRule;
 import akletini.life.core.shared.validation.rule.EntityNotNullRule;

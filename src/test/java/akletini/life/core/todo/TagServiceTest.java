@@ -1,6 +1,6 @@
 package akletini.life.core.todo;
 
-import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.entity.Tag;
 import akletini.life.core.todo.service.api.TagService;
@@ -26,7 +26,7 @@ public class TagServiceTest {
     TagService tagService;
 
     @Test
-    public void changeNameFailed() throws EntityNotFoundException, InvalidDataException {
+    public void changeNameFailed() throws BusinessException {
         // Given
         Tag tag = TestTodos.getUniTag();
         tag = tagService.store(tag);

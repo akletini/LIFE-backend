@@ -13,6 +13,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     public static final String DATE_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
+    public static final String LOCAL_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private DateUtils() {
 

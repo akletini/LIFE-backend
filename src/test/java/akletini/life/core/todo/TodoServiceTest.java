@@ -5,7 +5,7 @@ import akletini.life.core.chore.repository.api.ChoreRepository;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.shared.utils.DateUtils;
 import akletini.life.core.shared.validation.Errors;
-import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TagRepository;
 import akletini.life.core.todo.repository.api.TodoRepository;
@@ -74,7 +74,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void removeUsedTag() throws InvalidDataException, EntityNotFoundException {
+    public void removeUsedTag() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given
@@ -95,7 +95,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void modifyCreatedDate() throws EntityNotFoundException {
+    public void modifyCreatedDate() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given
@@ -117,8 +117,6 @@ public class TodoServiceTest {
             assertEquals(todoStoreException.getMessage(), Errors.getError(CREATED_DATE_UNCHANGED));
             assertTrue(DateUtils.isSameInstant(localDateTimeToDate(initialCreationDate),
                     localDateTimeToDate(todoService.getById(todo.getId()).getCreatedAt())));
-        } catch (InvalidDataException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -140,7 +138,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void updateUserAuthInTodo() throws InvalidDataException {
+    public void updateUserAuthInTodo() throws BusinessException {
         try (MockedStatic<ContextUtils> utils = Mockito.mockStatic(ContextUtils.class)) {
             utils.when(ContextUtils::getCurrentUser).thenReturn(user);
             // Given

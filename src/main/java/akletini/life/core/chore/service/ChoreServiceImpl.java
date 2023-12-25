@@ -6,7 +6,7 @@ import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.repository.entity.Interval;
 import akletini.life.core.shared.constants.FilterConstants;
 import akletini.life.core.shared.utils.DateUtils;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -40,7 +40,7 @@ public class ChoreServiceImpl extends ChoreService {
     }
 
     @Override
-    public Chore completeChore(Chore chore) throws InvalidDataException {
+    public Chore completeChore(Chore chore) throws BusinessException {
         validate(chore);
         if (chore.isShiftInterval()) {
             chore.setDueAt(DateUtils.dateToLocalDate(computeDueDate(chore.getId(), new Date(),
@@ -55,7 +55,7 @@ public class ChoreServiceImpl extends ChoreService {
     }
 
     @Override
-    public Chore store(Chore chore) throws InvalidDataException {
+    public Chore store(Chore chore) throws BusinessException {
         validate(chore);
         Date dueDate = chore.getDueAt() != null ? computeDueDate(chore.getId(),
                 DateUtils.localDateToDate(chore.getStartDate()), chore.getInterval()) :

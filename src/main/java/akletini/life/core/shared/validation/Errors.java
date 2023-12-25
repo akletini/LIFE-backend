@@ -10,6 +10,7 @@ public class Errors {
     public static final String COULD_NOT_STORE = "couldNotStore";
     public static final String ENTITY_IS_NULL = "entityIsNull";
     public static final String ENTITY_NOT_FOUND_BY_NAME = "entityNotFoundByName";
+    public static final String ENITTY_ALREADY_EXISTS = "entityAlreadyExists";
 
     public interface USER {
         String INVALID_TOKEN_CONTAINER = "invalidTokenContainer";

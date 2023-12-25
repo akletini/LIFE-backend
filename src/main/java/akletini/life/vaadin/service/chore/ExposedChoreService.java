@@ -4,7 +4,7 @@ import akletini.life.core.chore.dto.ChoreDto;
 import akletini.life.core.chore.dto.mapper.ChoreMapper;
 import akletini.life.core.chore.repository.entity.Chore;
 import akletini.life.core.chore.service.ChoreService;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class ExposedChoreService {
         this.choreMapper = choreMapper;
     }
 
-    public ChoreDto store(ChoreDto choreDto) throws InvalidDataException {
+    public ChoreDto store(ChoreDto choreDto) throws BusinessException {
         Chore chore = choreMapper.dtoToChore(choreDto);
         Chore storedChore = choreService.store(chore);
         return choreMapper.choreToDto(storedChore);
@@ -39,7 +39,7 @@ public class ExposedChoreService {
         choreService.delete(choreMapper.dtoToChore(choreDto));
     }
 
-    public void completeChore(ChoreDto choreDto) throws InvalidDataException {
+    public void completeChore(ChoreDto choreDto) throws BusinessException {
         choreService.completeChore(choreMapper.dtoToChore(choreDto));
     }
 }

@@ -1,7 +1,7 @@
 package akletini.life.vaadin.view.todo;
 
 import akletini.life.core.shared.constants.SortingConstants;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.todo.dto.TagDto;
 import akletini.life.core.todo.dto.TodoDto;
 import akletini.life.core.todo.repository.entity.Todo;
@@ -154,7 +154,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                     query();
                     datePicker.clear();
                     input.clear();
-                } catch (InvalidDataException e) {
+                } catch (BusinessException e) {
                     add(new ErrorModal(e.getMessage()));
                 }
             }
@@ -239,7 +239,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
                             TodoDto storedTodo = todoService.store(todoDto);
                             todos.set(todos.indexOf(todoDto), storedTodo);
                             todoGrid.setItems(todos.stream().toList());
-                        } catch (InvalidDataException ex) {
+                        } catch (BusinessException ex) {
                             add(new ErrorModal(ex.getMessage()));
                         }
                     });
@@ -330,7 +330,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
             });
             todoGrid.setItems(todos);
             tagEditor.setCreateVisible(false);
-        } catch (InvalidDataException e) {
+        } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }
     }
@@ -357,7 +357,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
             todos.set(todos.indexOf(todoDto), storedTodo);
             todoGrid.setItems(todos.stream().toList());
             todoEditor.setVisible(false);
-        } catch (InvalidDataException e) {
+        } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }
     }

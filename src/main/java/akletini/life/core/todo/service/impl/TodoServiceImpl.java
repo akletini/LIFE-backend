@@ -1,7 +1,7 @@
 package akletini.life.core.todo.service.impl;
 
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.repository.api.TodoRepository;
 import akletini.life.core.todo.repository.entity.Todo;
 import akletini.life.core.todo.service.api.GoogleTaskService;
@@ -34,7 +34,7 @@ public class TodoServiceImpl extends TodoService {
 
 
     @Override
-    public Todo store(Todo todo) throws InvalidDataException {
+    public Todo store(Todo todo) throws BusinessException {
         validate(todo);
 //            if (AuthProvider.GOOGLE.equals(todo.getAssignedUser().getAuthProvider())) {
 //                googleTaskService.storeTask(todo);

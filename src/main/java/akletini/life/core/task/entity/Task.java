@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,8 +18,6 @@ public class Task extends BaseEntity {
     @NonNull
     protected String title;
 
-    @NonNull
-    protected LocalDateTime createdAt;
     @NonNull
     protected LocalDate dueAt;
     protected String description;

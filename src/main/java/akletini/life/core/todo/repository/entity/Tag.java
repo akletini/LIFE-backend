@@ -1,7 +1,10 @@
 package akletini.life.core.todo.repository.entity;
 
-import akletini.life.core.shared.BaseEntity;
-import jakarta.persistence.*;
+import akletini.life.core.shared.NamedEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,10 +22,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "tags")
-public class Tag extends BaseEntity implements Serializable {
+public class Tag extends NamedEntity implements Serializable {
 
-    @Column(unique = true)
-    private String name;
     private String color;
 
     @OneToMany(mappedBy = "tag")

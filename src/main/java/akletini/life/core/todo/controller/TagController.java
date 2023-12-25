@@ -1,7 +1,7 @@
 package akletini.life.core.todo.controller;
 
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
-import akletini.life.core.shared.validation.exception.InvalidDataException;
 import akletini.life.core.todo.dto.TagDto;
 import akletini.life.core.todo.dto.mapper.TagMapper;
 import akletini.life.core.todo.repository.entity.Tag;
@@ -23,14 +23,14 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @PostMapping(value = "/add")
-    public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) throws InvalidDataException {
+    public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) throws BusinessException {
         Tag tag = tagMapper.dtoToTag(tagDto);
         Tag storedTag = tagService.store(tag);
         return ResponseEntity.status(HttpStatus.OK).body(tagMapper.tagToDto(storedTag));
     }
 
     @PutMapping(value = "/update")
-    public ResponseEntity<TagDto> updateTag(@RequestBody TagDto tagDto) throws InvalidDataException, EntityNotFoundException {
+    public ResponseEntity<TagDto> updateTag(@RequestBody TagDto tagDto) throws BusinessException {
         Tag tag = tagMapper.dtoToTag(tagDto);
         tagService.getById(tag.getId());
         Tag updatedTag = tagService.store(tag);
