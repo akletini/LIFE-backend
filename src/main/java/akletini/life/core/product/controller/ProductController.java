@@ -1,5 +1,7 @@
 package akletini.life.core.product.controller;
 
+import akletini.life.core.index.IndexService;
+import akletini.life.core.index.Indexes;
 import akletini.life.core.product.dto.ProductDto;
 import akletini.life.core.product.dto.mapper.ProductMapper;
 import akletini.life.core.product.repository.entity.Product;
@@ -10,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,8 @@ import static org.springframework.http.HttpStatus.OK;
 public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
+
+    private final IndexService indexService;
 
     @PostMapping(value = "/add")
     public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto productDto) throws BusinessException {
@@ -54,5 +59,10 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getAll() {
         List<Product> all = productService.getAll();
         return ResponseEntity.status(OK).body(all.stream().map(productMapper::productToDto).collect(Collectors.toList()));
+    }
+
+    @PostMapping(value = "/index")
+    public void reIndex() throws IOException {
+        indexService.reIndexSingleIndex(Indexes.PRODUCTS.getIndexName());
     }
 }

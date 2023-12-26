@@ -1,5 +1,6 @@
 package akletini.life.core.product.service.impl;
 
+import akletini.life.core.product.repository.api.attributeType.AttributeTypeIndexRepository;
 import akletini.life.core.product.repository.api.attributeType.AttributeTypeRepository;
 import akletini.life.core.product.repository.entity.AttributeType;
 import akletini.life.core.product.service.AttributeTypeService;
@@ -16,11 +17,12 @@ import org.springframework.stereotype.Service;
 public class AttributeTypeServiceImpl extends AttributeTypeService {
 
     private final AttributeTypeRepository attributeTypeRepository;
+    private final AttributeTypeIndexRepository attributeTypeIndexRepository;
 
     @Override
     public AttributeType store(AttributeType attributeType) throws BusinessException {
         AttributeType stored = super.store(attributeType);
-
+        attributeTypeRepository.save(attributeType);
         return stored;
     }
 

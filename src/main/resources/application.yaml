@@ -86,4 +86,6 @@ logging:
     org:
       hibernate:
         type: trace
+elastic:
+  url: localhost:9201
 name: test-yaml

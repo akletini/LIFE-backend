@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
 
@@ -15,12 +18,15 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "producttypes")
+@Document(indexName = "product_types")
 public class ProductType extends NamedEntity {
 
+    @Field(type = FieldType.Long)
     private Long parentProductType;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_types_id")
     @ToString.Exclude
+    @Field(type = FieldType.Nested)
     private List<AttributeType> attributeTypes;
 }

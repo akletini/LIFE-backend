@@ -7,8 +7,12 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+
+import static akletini.life.core.shared.utils.DateUtils.LOCAL_DATE_TIME_FORMAT;
 
 @Getter
 @Setter
@@ -20,5 +24,6 @@ public class BaseEntity {
     protected Long id;
 
     @NonNull
+    @Field(type = FieldType.Date, format = {}, pattern = LOCAL_DATE_TIME_FORMAT)
     protected LocalDateTime createdAt;
 }

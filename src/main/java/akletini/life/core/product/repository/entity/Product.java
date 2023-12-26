@@ -11,10 +11,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static akletini.life.core.shared.utils.DateUtils.LOCAL_DATE_TIME_FORMAT;
 
 @Getter
 @Setter
@@ -29,8 +26,6 @@ public class Product extends NamedEntity {
     private String name;
     @Field(type = FieldType.Text)
     private String description;
-    @Field(type = FieldType.Date, format = {}, pattern = LOCAL_DATE_TIME_FORMAT)
-    private LocalDateTime createdAt;
     @Field(type = FieldType.Nested)
     private Quantity quantity;
 

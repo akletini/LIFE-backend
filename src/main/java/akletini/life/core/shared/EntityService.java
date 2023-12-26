@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,14 @@ public abstract class EntityService<T extends BaseEntity> {
 
     @Autowired
     protected ListCrudRepository<T, Long> entityRepository;
+
+    public List<T> storeBulk(List<T> objects) throws BusinessException {
+        List<T> storedObjects = new ArrayList<>();
+        for (T object : objects) {
+            storedObjects.add(store(object));
+        }
+        return storedObjects;
+    }
 
 
     public boolean validate(T object) throws BusinessException {

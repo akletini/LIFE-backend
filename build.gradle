@@ -8,9 +8,13 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.2'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'com.palantir.docker' version '0.34.0'
-    id 'com.palantir.docker-run' version '0.34.0'
+    id 'com.bmuschko.docker-remote-api' version '9.4.0'
 }
+
+
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 
 group = 'akletini'
 version = '0.0.1-SNAPSHOT'
@@ -68,6 +72,7 @@ dependencies {
     implementation "org.vaadin.addons.tatu:colorpicker:1.4.1"
 
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -81,20 +86,45 @@ dependencies {
 
 }
 
-tasks.named("dockerRun") {
-    dockerRun {
-        name "life-test-postgres"
-        image "postgres"
-        ports "54321:5432"
-        daemonize true
-        clean true
-        env "POSTGRES_PASSWORD": "postgres"
-    }
+tasks.register('createPostgresDocker', DockerCreateContainer) {
+    containerName = "life-test-postgres"
+    image = "postgres"
+    imageId = "9f3ec01f884db0c4e6b637c730043ad1ac9dcaa684e8fa5b858ddf72a3848ddf"
+    envVars = Map.of("POSTGRES_PASSWORD", "postgres")
+    hostConfig.portBindings = ['54321:5432']
+    hostConfig.autoRemove = true
 }
-tasks.named("dockerRun").get().finalizedBy(tasks.named("test").get())
+tasks.register('startPostgresDocker', DockerStartContainer) {
+    dependsOn createPostgresDocker
+    containerId = createPostgresDocker.getContainerId()
+}
+//tasks.register('waitForPostgresDocker', DockerWaitContainer) {
+//    dependsOn startPostgresDocker
+//    containerId = createPostgresDocker.getContainerId()
+//}
+tasks.register('createESDocker', DockerCreateContainer) {
+    dependsOn startPostgresDocker
+    containerName = "life-test-elastic"
+    image = "docker.elastic.co/elasticsearch/elasticsearch:8.11.3"
+    imageId = "792fab0c0bd881e19b2cac46d1d7b555d81f02d73d8c0ebab3fd511b5dc5d508"
+    envVars = Map.of("discovery.type", "single-node",
+            "xpack.security.enabled", "false")
+    hostConfig.portBindings = ['9201:9200']
+    hostConfig.autoRemove = true
+}
+tasks.register('startESDocker', DockerStartContainer) {
+    dependsOn createESDocker
+    containerId = createESDocker.getContainerId()
+}
+startESDocker.doLast {
+    sleep(50 * 1000)
+}
+
+
+tasks.named("startESDocker").get().finalizedBy(tasks.named("test").get())
 
 test {
-    dependsOn(tasks.named("dockerRun").get())
+    dependsOn(tasks.named("startESDocker").get())
     useJUnitPlatform()
 
     testLogging {
@@ -102,10 +132,13 @@ test {
     }
 }
 
-tasks.named("dockerStop") {
-    dockerStop {
-    }
+tasks.register('removePostgresDocker', DockerRemoveContainer) {
+    dependsOn test
+    targetContainerId(createPostgresDocker.getContainerId())
 }
-tasks.named("test").get().finalizedBy(tasks.named("dockerStop").get())
+tasks.register('removeESDocker', DockerRemoveContainer) {
+    dependsOn removePostgresDocker
+    targetContainerId(createESDocker.getContainerId())
+}
 
 

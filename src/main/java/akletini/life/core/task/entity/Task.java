@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Task extends BaseEntity {
 
     @NonNull
