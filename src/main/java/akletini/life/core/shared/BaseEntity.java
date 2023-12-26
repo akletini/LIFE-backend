@@ -7,6 +7,8 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.data.annotation.AccessType;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
@@ -26,4 +28,10 @@ public abstract class BaseEntity {
     @NonNull
     @Field(type = FieldType.Date, format = {}, pattern = LOCAL_DATE_TIME_FORMAT)
     protected LocalDateTime createdAt;
+
+    @Field
+    @ReadOnlyProperty
+    @AccessType(AccessType.Type.PROPERTY)
+    public void set_class(String _class) {
+    }
 }

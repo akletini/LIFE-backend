@@ -4,4 +4,6 @@ import akletini.life.core.product.repository.entity.Product;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface ProductIndexRepository extends ElasticsearchRepository<Product, Long> {
+    @Override
+    Iterable<Product> findAll();
 }

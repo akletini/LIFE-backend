@@ -15,6 +15,6 @@ public class ProductDto {
     private String description;
     private LocalDateTime createdAt;
     private Quantity quantity;
-    private ProductTypeDto productTypeDto;
+    private ProductTypeDto productType;
     private List<AttributeDto> attributes;
 }

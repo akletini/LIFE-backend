@@ -15,4 +15,6 @@ public abstract class ProductTypeService extends EntityService<ProductType> {
     public abstract List<AttributeType> getAttributeTypesForProductType(ProductType productType) throws EntityNotFoundException;
 
     public abstract Map<ProductType, List<ProductType>> constructHierarchy();
+
+    public abstract List<ProductType> getProductTypesUpToRoot(ProductType startProductType);
 }

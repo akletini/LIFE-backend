@@ -98,6 +98,27 @@ public class ProductTypeServiceImpl extends ProductTypeService {
         return hierarchyMap;
     }
 
+    @Override
+    public List<ProductType> getProductTypesUpToRoot(ProductType startProductType) {
+        List<ProductType> allProductTypes = getAll();
+        List<ProductType> typesUpToRoot = new ArrayList<>();
+
+        // Find the root product type by checking for null parent ID
+        while (startProductType != null) {
+            typesUpToRoot.add(startProductType);
+            Long parentId = startProductType.getParentProductType();
+
+            // Find the parent product type
+            startProductType = allProductTypes.stream()
+                    .filter(type -> Objects.equals(type.getId(), parentId))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        Collections.reverse(typesUpToRoot); // Reverse to get from root to the given product type
+        return typesUpToRoot;
+    }
+
     private void addInheritedAttributeTypes(ProductType productType) {
         List<AttributeType> attributeTypes = productType.getAttributeTypes() != null ?
                 new ArrayList<>(productType.getAttributeTypes()) : new ArrayList<>();

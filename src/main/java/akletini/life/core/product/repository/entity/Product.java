@@ -26,11 +26,12 @@ public class Product extends NamedEntity {
     private String name;
     @Field(type = FieldType.Text)
     private String description;
-    @Field(type = FieldType.Nested)
+    @Field(type = FieldType.Object)
     private Quantity quantity;
 
     @ManyToOne
     @JoinColumn(name = "product_type_id")
+    @Field(type = FieldType.Object)
     private ProductType productType;
     @Field(type = FieldType.Nested, includeInParent = true)
     @Convert(converter = AttributeListConverter.class)

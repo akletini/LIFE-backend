@@ -11,10 +11,7 @@ import akletini.life.vaadin.view.MainView;
 import akletini.life.vaadin.view.components.ErrorModal;
 import akletini.life.vaadin.view.components.PagedGridView;
 import akletini.life.vaadin.view.components.Pagination;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
@@ -22,13 +19,13 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Input;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
@@ -64,7 +61,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
     private final Grid<TodoDto> todoGrid;
     private List<TodoDto> todos;
     private DatePicker datePicker;
-    private Input input;
+    private TextField input;
     private int currentPage = 0;
     private int pageSize = 10;
     private Component mainContent;
@@ -81,15 +78,18 @@ public class TodoView extends VerticalLayout implements PagedGridView {
         todoGrid = new Grid<>();
         initializeGrid(todoGrid);
         HorizontalLayout createTodoLayout = new HorizontalLayout();
-        input = new Input();
+        input = new TextField("Title");
         input.setPlaceholder("Enter todo title...");
         input.setWidthFull();
+        input.setRequired(true);
+        input.addKeyPressListener(Key.ENTER, event -> createNewTodo());
         input.setRequiredIndicatorVisible(true);
-        datePicker = new DatePicker();
+        datePicker = new DatePicker("Due date");
         datePicker.setLocale(Locale.GERMAN);
         Button addTodoButton = new Button("Add");
-        addTodoButton.addClickListener(onCreateTodo(todoGrid));
+        addTodoButton.addClickListener(onCreateTodo());
         createTodoLayout.setWidthFull();
+        createTodoLayout.setVerticalComponentAlignment(Alignment.END, addTodoButton);
         createTodoLayout.add(input, datePicker, addTodoButton);
 
         HorizontalLayout filterLayout = new HorizontalLayout();
@@ -141,24 +141,28 @@ public class TodoView extends VerticalLayout implements PagedGridView {
     }
 
     @NonNull
-    private ComponentEventListener<ClickEvent<Button>> onCreateTodo(Grid<TodoDto> todoGrid) {
+    private ComponentEventListener<ClickEvent<Button>> onCreateTodo() {
         return event -> {
-            TodoDto todo = new TodoDto();
-            if (!StringUtils.isEmpty(input.getValue())) {
-                todo.setTitle(input.getValue());
-                todo.setState(Todo.State.OPEN);
-                todo.setCreatedAt(LocalDateTime.now());
-                todo.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
-                try {
-                    todoService.store(todo);
-                    query();
-                    datePicker.clear();
-                    input.clear();
-                } catch (BusinessException e) {
-                    add(new ErrorModal(e.getMessage()));
-                }
-            }
+            createNewTodo();
         };
+    }
+
+    private void createNewTodo() {
+        TodoDto todo = new TodoDto();
+        if (!StringUtils.isEmpty(input.getValue())) {
+            todo.setTitle(input.getValue());
+            todo.setState(Todo.State.OPEN);
+            todo.setCreatedAt(LocalDateTime.now());
+            todo.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
+            try {
+                todoService.store(todo);
+                query();
+                datePicker.clear();
+                input.clear();
+            } catch (BusinessException e) {
+                add(new ErrorModal(e.getMessage()));
+            }
+        }
     }
 
     private void initializeGrid(Grid<TodoDto> todoGrid) {
