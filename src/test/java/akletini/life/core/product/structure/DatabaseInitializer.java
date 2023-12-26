@@ -93,7 +93,7 @@ public class DatabaseInitializer implements ApplicationRunner {
         Product product = new Product();
         product.setName("Vacuum");
         product.setCreatedAt(LocalDateTime.now());
-        product.setQuantity(new Quantity(1, Quantity.QuantityDescription.PIECE, "Piece"));
+        product.setQuantity(new Quantity(1L, Quantity.QuantityDescription.PIECE, "Piece"));
         product.setProductType(nonFoodProductType);
         List<AttributeType> attributeTypesForProductType =
                 productTypeService.getAttributeTypesForProductType(nonFoodProductType);
@@ -108,7 +108,7 @@ public class DatabaseInitializer implements ApplicationRunner {
         Product product = new Product();
         product.setName("Beer");
         product.setCreatedAt(LocalDateTime.now());
-        product.setQuantity(new Quantity(10, Quantity.QuantityDescription.VOLUME, "l"));
+        product.setQuantity(new Quantity(10L, Quantity.QuantityDescription.VOLUME, "l"));
         product.setProductType(foodProductType);
         List<AttributeType> attributeTypesForProductType =
                 productTypeService.getAttributeTypesForProductType(foodProductType);
@@ -124,7 +124,7 @@ public class DatabaseInitializer implements ApplicationRunner {
         Product product = new Product();
         product.setName("Frozen Pizza");
         product.setCreatedAt(LocalDateTime.now());
-        product.setQuantity(new Quantity(1, Quantity.QuantityDescription.PIECE, "Piece"));
+        product.setQuantity(new Quantity(1L, Quantity.QuantityDescription.PIECE, "Piece"));
         product.setProductType(frozenFoodProductType);
         List<AttributeType> attributeTypesForProductType =
                 productTypeService.getAttributeTypesForProductType(frozenFoodProductType);

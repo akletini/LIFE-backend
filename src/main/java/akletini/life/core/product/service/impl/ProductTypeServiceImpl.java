@@ -132,5 +132,29 @@ public class ProductTypeServiceImpl extends ProductTypeService {
         productType.setAttributeTypes(new LinkedHashSet<>(attributeTypes).stream().toList());
     }
 
+    @Override
+    public List<ProductType> getAllChildProductTypes(ProductType parentProductType) {
+        List<ProductType> childProductTypes = new ArrayList<>();
+
+        // Find children recursively
+        findChildProductTypes(parentProductType.getId(), productTypeRepository.findAll(),
+                childProductTypes);
+
+        return childProductTypes;
+    }
+
+    // Recursive method to find child product types
+    private void findChildProductTypes(Long parentId, List<ProductType> allProductTypes,
+                                       List<ProductType> childProductTypes) {
+        List<ProductType> directChildren = allProductTypes.stream()
+                .filter(type -> Objects.equals(type.getParentProductType(), parentId))
+                .toList();
+
+        for (ProductType child : directChildren) {
+            childProductTypes.add(child);
+            findChildProductTypes(child.getId(), allProductTypes, childProductTypes);
+        }
+    }
+
 
 }

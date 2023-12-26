@@ -17,4 +17,6 @@ public abstract class ProductTypeService extends EntityService<ProductType> {
     public abstract Map<ProductType, List<ProductType>> constructHierarchy();
 
     public abstract List<ProductType> getProductTypesUpToRoot(ProductType startProductType);
+
+    public abstract List<ProductType> getAllChildProductTypes(ProductType parentProductType);
 }

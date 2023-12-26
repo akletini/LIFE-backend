@@ -4,6 +4,7 @@ import akletini.life.core.product.dto.ProductDto;
 import akletini.life.core.product.dto.mapper.ProductMapper;
 import akletini.life.core.product.repository.entity.Product;
 import akletini.life.core.product.service.ProductService;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,5 +28,9 @@ public class ExposedProductService {
         Page<Product> products = productService.getProducts(page, pageSize, productTypeId,
                 searchProductTypeRecursive, searchTerm);
         return products.map(productMapper::productToDto);
+    }
+
+    public ProductDto store(ProductDto productDto) throws BusinessException {
+        return productMapper.productToDto(productService.store(productMapper.dtoToProduct(productDto)));
     }
 }

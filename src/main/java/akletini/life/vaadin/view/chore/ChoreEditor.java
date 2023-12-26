@@ -90,7 +90,6 @@ public class ChoreEditor extends FormLayout {
 
         dueAt.setValue(LocalDate.now());
         intervalUnit.setValue(Interval.DateUnit.DAYS);
-
     }
 
     public static abstract class ChoreFormEvent extends ComponentEvent<ChoreEditor> {

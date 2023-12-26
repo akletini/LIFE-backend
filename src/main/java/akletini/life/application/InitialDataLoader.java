@@ -80,7 +80,7 @@ public class InitialDataLoader implements ApplicationRunner {
             Product product = new Product();
             product.setName("Beer");
             product.setCreatedAt(LocalDateTime.now());
-            product.setQuantity(new Quantity(10, Quantity.QuantityDescription.VOLUME, "l"));
+            product.setQuantity(new Quantity(10L, Quantity.QuantityDescription.VOLUME, "l"));
             product.setProductType(foodProductType);
             List<AttributeType> attributeTypesForProductType =
                     productTypeService.getAttributeTypesForProductType(foodProductType);

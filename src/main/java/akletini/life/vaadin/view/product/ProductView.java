@@ -1,7 +1,9 @@
 package akletini.life.vaadin.view.product;
 
+import akletini.life.core.product.dto.AttributeDto;
 import akletini.life.core.product.dto.ProductDto;
 import akletini.life.core.product.dto.ProductTypeDto;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.vaadin.service.product.ExposedProductService;
 import akletini.life.vaadin.service.product.ExposedProductTypeService;
@@ -14,8 +16,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.PageTitle;
@@ -41,9 +45,10 @@ public class ProductView extends VerticalLayout implements PagedGridView {
     private TextField searchInput;
     private Button executeSearchButton;
     private Button newProductButton;
+    private ProductEditor productEditor;
 
     public ProductView(ExposedProductService productService,
-                       ExposedProductTypeService productTypeService) {
+                       ExposedProductTypeService productTypeService) throws EntityNotFoundException {
         this.productService = productService;
         this.productTypeService = productTypeService;
         H1 title = new H1("Products page");
@@ -55,7 +60,9 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         pagination = new Pagination(10, 0);
         pagination.addQueryListener(event -> query());
         initializeMainContentLayout();
-        add(title, searchLayout, gridContentLayout, pagination);
+        configureEditor();
+        add(getEditorLayout(new VerticalLayout(title, searchLayout, gridContentLayout,
+                pagination)));
     }
 
     private Component createSearchLayout() {
@@ -65,9 +72,32 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         executeSearchButton = new Button("Search");
         executeSearchButton.addClickListener(event -> query());
         newProductButton = new Button("New Product");
-        layout.setVerticalComponentAlignment(Alignment.END, executeSearchButton);
+        newProductButton.addClickListener(event -> {
+            ProductTypeSelectionPanel productTypeSelectionPanel =
+                    new ProductTypeSelectionPanel(productTypeService);
+            productTypeSelectionPanel.addNextListener(e -> {
+                try {
+                    productEditor.setEditorVisible(new ProductDto(), e.getProductTypeDto(), true);
+                } catch (EntityNotFoundException ex) {
+                    add(new ErrorModal(ex.getMessage()));
+                }
+                productTypeSelectionPanel.getDialog().close();
+            });
+            productTypeSelectionPanel.addCancelListener(e -> {
+                productTypeSelectionPanel.getDialog().close();
+            });
+            add(productTypeSelectionPanel);
+        });
+        layout.setVerticalComponentAlignment(Alignment.END, executeSearchButton, newProductButton);
         layout.add(searchInput, executeSearchButton, newProductButton);
         return layout;
+    }
+
+    private SplitLayout getEditorLayout(VerticalLayout mainContent) {
+        SplitLayout content = new SplitLayout(mainContent, productEditor);
+        content.setSplitterPosition(65.0);
+        content.setSizeFull();
+        return content;
     }
 
     private void initializeMainContentLayout() {
@@ -105,8 +135,25 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         grid.addColumn(productDto -> productDto.getProductType().getName())
                 .setHeader("Product type")
                 .setSortable(true);
+        grid.addComponentColumn(productDto -> {
+            ListBox<String> listBox = new ListBox<>();
+            listBox.setReadOnly(true);
+            List<String> attributes = new ArrayList<>();
+            for (AttributeDto attribute : productDto.getAttributes()) {
+                attributes.add(attribute.getAttributeType().getName() + ": " + attribute.getValue());
+            }
+            listBox.setItems(attributes);
+            return listBox;
+        }).setHeader("Attributes");
         grid.getColumns().forEach(column -> column.setAutoWidth(true));
+    }
 
+
+    private void configureEditor() throws EntityNotFoundException {
+        productEditor = new ProductEditor(productTypeService, null);
+        productEditor.setWidth("25em");
+        productEditor.setVisible(false);
+        productEditor.addSaveListener(this::saveProduct);
     }
 
     @Override
@@ -127,6 +174,15 @@ public class ProductView extends VerticalLayout implements PagedGridView {
             pagination.totalPages = products.getTotalPages();
             grid.setItems(this.products.toList());
         } catch (IOException | EntityNotFoundException e) {
+            add(new ErrorModal(e.getMessage()));
+        }
+    }
+
+    private void saveProduct(ProductEditor.SaveEvent saveEvent) {
+        try {
+            productService.store(saveEvent.getProduct());
+            productEditor.setVisible(false);
+        } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }
     }

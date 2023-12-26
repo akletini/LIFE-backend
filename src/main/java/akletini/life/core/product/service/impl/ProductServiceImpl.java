@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -117,13 +118,14 @@ public class ProductServiceImpl extends ProductService {
 
     private void addRecursiveProductTypesToQuery(Long productTypeId,
                                                  BoolQuery.Builder boolQueryBuilder) throws EntityNotFoundException {
-        List<Long> productTypesUpToRoot =
+        List<Long> childProductTypes =
                 productTypeService
-                        .getProductTypesUpToRoot(productTypeService.getById
+                        .getAllChildProductTypes(productTypeService.getById
                                 (productTypeId))
-                        .stream().map(BaseEntity::getId).toList();
+                        .stream().map(BaseEntity::getId).collect(Collectors.toList());
+        childProductTypes.add(productTypeId);
         List<Query> productTypeQueries = new ArrayList<>();
-        productTypesUpToRoot.forEach(id -> {
+        childProductTypes.forEach(id -> {
             Query q = new Query.Builder()
                     .match(new MatchQuery.Builder()
                             .field("productType.id")
@@ -131,6 +133,9 @@ public class ProductServiceImpl extends ProductService {
                             .build()).build();
             productTypeQueries.add(q);
         });
-        boolQueryBuilder.should(productTypeQueries);
+        boolQueryBuilder.must(new Query.Builder()
+                .bool(new BoolQuery.Builder().should(productTypeQueries)
+                        .build())
+                .build());
     }
 }

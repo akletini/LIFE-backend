@@ -19,7 +19,7 @@ public class TestProducts {
         Product product = new Product();
         product.setName("TestProduct");
         product.setDescription("Some description...");
-        product.setQuantity(new Quantity(3, WEIGHT, "kg"));
+        product.setQuantity(new Quantity(3L, WEIGHT, "kg"));
         product.setCreatedAt(LocalDateTime.now());
         return product;
     }
