@@ -5,6 +5,7 @@ import akletini.life.core.shared.constants.SortingConstants;
 import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.vaadin.service.chore.ExposedChoreService;
 import akletini.life.vaadin.view.MainView;
+import akletini.life.vaadin.view.components.CrudButtonLayout;
 import akletini.life.vaadin.view.components.ErrorModal;
 import akletini.life.vaadin.view.components.PagedGridView;
 import akletini.life.vaadin.view.components.Pagination;
@@ -27,15 +28,11 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static akletini.life.core.shared.constants.FilterConstants.ACTIVE;
@@ -111,39 +108,6 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
         return filterLayout;
     }
 
-    @NonNull
-    private HorizontalLayout createInputLayout() {
-        HorizontalLayout createTodoLayout = new HorizontalLayout();
-        titleInput = new Input();
-        titleInput.setPlaceholder("Enter chore title...");
-        titleInput.setWidthFull();
-        titleInput.setRequiredIndicatorVisible(true);
-        datePicker = new DatePicker();
-        datePicker.setLocale(Locale.GERMAN);
-        datePicker.setValue(LocalDate.now());
-        addChoreButton = new Button("Add");
-        addChoreButton.addClickListener(event -> {
-            if (!StringUtils.isEmpty(titleInput.getValue())) {
-                ChoreDto choreDto = new ChoreDto();
-                choreDto.setTitle(titleInput.getValue());
-                choreDto.setCreatedAt(LocalDateTime.now());
-                choreDto.setStartDate(LocalDate.now());
-                choreDto.setDueAt(datePicker.getOptionalValue().orElse(LocalDate.now()));
-                try {
-                    choreService.store(choreDto);
-                    query();
-                    datePicker.clear();
-                    titleInput.clear();
-                } catch (BusinessException e) {
-                    add(new ErrorModal(e.getMessage()));
-                }
-            }
-        });
-        createTodoLayout.setWidthFull();
-        createTodoLayout.add(titleInput, datePicker, addChoreButton);
-        return createTodoLayout;
-    }
-
     private void initializeGrid(Grid<ChoreDto> grid) {
         chores = choreService.getChores(currentPage, pageSize, Optional.empty(),
                 Optional.of(List.of(ACTIVE)));
@@ -186,31 +150,18 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
                 .setHeader("Shift interval")
                 .setSortable(true);
         grid.addComponentColumn(choreDto -> {
-            HorizontalLayout layout = new HorizontalLayout();
-            Button complete = new Button();
-            complete.addThemeVariants(ButtonVariant.LUMO_ICON,
-                    ButtonVariant.LUMO_SUCCESS,
-                    ButtonVariant.LUMO_TERTIARY);
-            complete.addClickListener(event -> {
+            CrudButtonLayout layout = new CrudButtonLayout();
+            layout.getComplete().addClickListener(event -> {
                 try {
                     choreService.completeChore(choreDto);
                 } catch (BusinessException e) {
                     add(new ErrorModal(e.getMessage()));
                 }
             });
-            complete.setIcon(new Icon(VaadinIcon.CHECK));
-            Button edit = new Button();
-            edit.addThemeVariants(ButtonVariant.LUMO_ICON,
-                    ButtonVariant.LUMO_TERTIARY);
-            edit.setIcon(new Icon(VaadinIcon.EDIT));
-            edit.addClickListener(event -> choreEditor.setEditorVisible(choreDto, false));
-            Button delete = new Button();
-            delete.addThemeVariants(ButtonVariant.LUMO_ICON,
-                    ButtonVariant.LUMO_ERROR,
-                    ButtonVariant.LUMO_TERTIARY);
-            delete.setIcon(new Icon(VaadinIcon.TRASH));
-            delete.addClickListener(event -> choreService.delete(choreDto));
-            layout.add(complete, edit, delete);
+
+            layout.getEdit().addClickListener(event -> choreEditor.setEditorVisible(choreDto,
+                    false));
+            layout.getDelete().addClickListener(event -> choreService.delete(choreDto));
             return layout;
         });
         grid.getColumns().forEach(column -> column.setAutoWidth(true));

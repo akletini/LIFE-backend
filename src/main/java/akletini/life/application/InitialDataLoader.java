@@ -43,6 +43,13 @@ public class InitialDataLoader implements ApplicationRunner {
             boughtOnAttributeType.setCreatedAt(LocalDateTime.now());
             attributeTypeService.store(boughtOnAttributeType);
 
+            AttributeType boughtFromAttributeType = new AttributeType();
+            boughtFromAttributeType.setName("Bought from");
+            boughtFromAttributeType.setBasicType(BasicType.String);
+            boughtFromAttributeType.setRequired(false);
+            boughtFromAttributeType.setCreatedAt(LocalDateTime.now());
+            attributeTypeService.store(boughtFromAttributeType);
+
             ProductType rootProductType = new ProductType();
             rootProductType.setName("Root");
             rootProductType.setCreatedAt(LocalDateTime.now());
@@ -61,6 +68,14 @@ public class InitialDataLoader implements ApplicationRunner {
             nonFoodProductType.setParentProductType(rootProductType.getId());
             nonFoodProductType.setAttributeTypes(List.of(boughtOnAttributeType));
             nonFoodProductType = productTypeService.store(nonFoodProductType);
+
+            ProductType frozenFoodProductType = new ProductType();
+            frozenFoodProductType.setName("Frozen Food");
+            frozenFoodProductType.setCreatedAt(LocalDateTime.now());
+            frozenFoodProductType.setParentProductType(foodProductType.getId());
+            frozenFoodProductType.setAttributeTypes(List.of(boughtFromAttributeType));
+            frozenFoodProductType = productTypeService.store(frozenFoodProductType);
+
 
             Product product = new Product();
             product.setName("Beer");

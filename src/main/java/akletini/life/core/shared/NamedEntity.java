@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public class NamedEntity extends BaseEntity {
+public abstract class NamedEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
 }

@@ -12,10 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -76,6 +73,29 @@ public class ProductTypeServiceImpl extends ProductTypeService {
             return foundPropertyType.getAttributeTypes();
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public Map<ProductType, List<ProductType>> constructHierarchy() {
+        List<ProductType> allProductTypes = getAll();
+        Map<ProductType, List<ProductType>> hierarchyMap = new LinkedHashMap<>();
+
+        Map<Long, List<ProductType>> parentIdToChildrenMap = new LinkedHashMap<>();
+
+        // Grouping product types by their parent ID
+        for (ProductType productType : allProductTypes) {
+            Long parentId = productType.getParentProductType();
+            parentIdToChildrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(productType);
+        }
+
+        // Building the hierarchy map
+        for (ProductType productType : allProductTypes) {
+            List<ProductType> children = parentIdToChildrenMap.get(productType.getId());
+            productType.setChildProductTypes(children != null ? children : new ArrayList<>());
+            hierarchyMap.put(productType, children != null ? children : Collections.emptyList());
+        }
+
+        return hierarchyMap;
     }
 
     private void addInheritedAttributeTypes(ProductType productType) {

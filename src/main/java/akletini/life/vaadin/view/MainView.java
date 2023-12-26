@@ -1,6 +1,7 @@
 package akletini.life.vaadin.view;
 
 import akletini.life.vaadin.view.chore.ChoreView;
+import akletini.life.vaadin.view.product.ProductView;
 import akletini.life.vaadin.view.todo.TodoView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -44,7 +45,7 @@ public class MainView extends AppLayout {
         tabs.add(createTab(VaadinIcon.DASHBOARD, "Dashboard", MainView.class),
                 createTab(VaadinIcon.TASKS, "Chores", ChoreView.class),
                 createTab(VaadinIcon.CHECK, "Todos", TodoView.class),
-                createTab(VaadinIcon.PACKAGE, "Products", null));
+                createTab(VaadinIcon.PACKAGE, "Products", ProductView.class));
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
         return tabs;
     }

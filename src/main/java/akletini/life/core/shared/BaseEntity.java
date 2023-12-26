@@ -17,7 +17,7 @@ import static akletini.life.core.shared.utils.DateUtils.LOCAL_DATE_TIME_FORMAT;
 @Getter
 @Setter
 @MappedSuperclass
-public class BaseEntity {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

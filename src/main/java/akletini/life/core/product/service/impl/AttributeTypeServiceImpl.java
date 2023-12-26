@@ -22,7 +22,7 @@ public class AttributeTypeServiceImpl extends AttributeTypeService {
     @Override
     public AttributeType store(AttributeType attributeType) throws BusinessException {
         AttributeType stored = super.store(attributeType);
-        attributeTypeRepository.save(attributeType);
+        attributeTypeIndexRepository.save(attributeType);
         return stored;
     }
 

@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,10 @@ public class ProductType extends NamedEntity {
 
     @Field(type = FieldType.Long)
     private Long parentProductType;
+
+    @Transient
+    @ToString.Exclude
+    private List<ProductType> childProductTypes = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_types_id")
