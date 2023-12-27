@@ -33,4 +33,8 @@ public class ExposedProductService {
     public ProductDto store(ProductDto productDto) throws BusinessException {
         return productMapper.productToDto(productService.store(productMapper.dtoToProduct(productDto)));
     }
+
+    public void delete(ProductDto productDto) {
+        productService.delete(productMapper.dtoToProduct(productDto));
+    }
 }

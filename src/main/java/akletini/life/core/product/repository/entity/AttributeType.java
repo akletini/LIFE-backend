@@ -1,7 +1,10 @@
 package akletini.life.core.product.repository.entity;
 
 import akletini.life.core.shared.NamedEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,9 +21,6 @@ import java.io.Serializable;
 @Table(name = "attributetypes")
 @Document(indexName = "attribute_types")
 public class AttributeType extends NamedEntity implements Serializable {
-
-    @Column(unique = true)
-    private String name;
 
     private boolean required;
 

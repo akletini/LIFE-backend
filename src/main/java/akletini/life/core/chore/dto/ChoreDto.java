@@ -1,20 +1,20 @@
 package akletini.life.core.chore.dto;
 
 import akletini.life.core.chore.repository.entity.Interval;
+import akletini.life.core.shared.dto.BaseDto;
 import akletini.life.core.user.dto.UserDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class ChoreDto {
+@EqualsAndHashCode(callSuper = true)
+public class ChoreDto extends BaseDto {
 
-    private Long id;
     private String title;
-    private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDate dueAt;
     private String description;
     private LocalDate startDate = LocalDate.now();

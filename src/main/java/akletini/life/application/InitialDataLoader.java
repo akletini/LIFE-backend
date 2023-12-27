@@ -12,7 +12,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,45 +32,38 @@ public class InitialDataLoader implements ApplicationRunner {
             priceAttributeType.setName("Price");
             priceAttributeType.setBasicType(BasicType.Number);
             priceAttributeType.setRequired(false);
-            priceAttributeType.setCreatedAt(LocalDateTime.now());
             attributeTypeService.store(priceAttributeType);
 
             AttributeType boughtOnAttributeType = new AttributeType();
             boughtOnAttributeType.setName("Bought on");
             boughtOnAttributeType.setBasicType(BasicType.Date);
             boughtOnAttributeType.setRequired(false);
-            boughtOnAttributeType.setCreatedAt(LocalDateTime.now());
             attributeTypeService.store(boughtOnAttributeType);
 
             AttributeType boughtFromAttributeType = new AttributeType();
             boughtFromAttributeType.setName("Bought from");
             boughtFromAttributeType.setBasicType(BasicType.String);
             boughtFromAttributeType.setRequired(false);
-            boughtFromAttributeType.setCreatedAt(LocalDateTime.now());
             attributeTypeService.store(boughtFromAttributeType);
 
             ProductType rootProductType = new ProductType();
             rootProductType.setName("Root");
-            rootProductType.setCreatedAt(LocalDateTime.now());
             rootProductType = productTypeService.store(rootProductType);
 
             ProductType foodProductType = new ProductType();
             foodProductType.setName("Food");
-            foodProductType.setCreatedAt(LocalDateTime.now());
             foodProductType.setParentProductType(rootProductType.getId());
             foodProductType.setAttributeTypes(List.of(priceAttributeType, boughtOnAttributeType));
             foodProductType = productTypeService.store(foodProductType);
 
             ProductType nonFoodProductType = new ProductType();
             nonFoodProductType.setName("Non-Food");
-            nonFoodProductType.setCreatedAt(LocalDateTime.now());
             nonFoodProductType.setParentProductType(rootProductType.getId());
             nonFoodProductType.setAttributeTypes(List.of(boughtOnAttributeType));
             nonFoodProductType = productTypeService.store(nonFoodProductType);
 
             ProductType frozenFoodProductType = new ProductType();
             frozenFoodProductType.setName("Frozen Food");
-            frozenFoodProductType.setCreatedAt(LocalDateTime.now());
             frozenFoodProductType.setParentProductType(foodProductType.getId());
             frozenFoodProductType.setAttributeTypes(List.of(boughtFromAttributeType));
             frozenFoodProductType = productTypeService.store(frozenFoodProductType);
@@ -79,7 +71,6 @@ public class InitialDataLoader implements ApplicationRunner {
 
             Product product = new Product();
             product.setName("Beer");
-            product.setCreatedAt(LocalDateTime.now());
             product.setQuantity(new Quantity(10L, Quantity.QuantityDescription.VOLUME, "l"));
             product.setProductType(foodProductType);
             List<AttributeType> attributeTypesForProductType =

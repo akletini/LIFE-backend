@@ -27,7 +27,7 @@ public abstract class BaseEntity {
 
     @NonNull
     @Field(type = FieldType.Date, format = {}, pattern = LOCAL_DATE_TIME_FORMAT)
-    protected LocalDateTime createdAt;
+    protected final LocalDateTime createdAt = LocalDateTime.now();
 
     @Field
     @ReadOnlyProperty

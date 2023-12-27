@@ -50,6 +50,12 @@ public class ProductServiceImpl extends ProductService {
     }
 
     @Override
+    public void delete(Product product) {
+        super.delete(product);
+        entityIndexRepository.delete(product);
+    }
+
+    @Override
     public Page<Product> getProducts(int page,
                                      int pageSize,
                                      Long productTypeId,

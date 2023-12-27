@@ -9,6 +9,7 @@ import akletini.life.core.product.repository.entity.BasicType;
 import akletini.life.core.product.repository.entity.Quantity;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.vaadin.service.product.ExposedProductTypeService;
+import akletini.life.vaadin.view.components.ConfirmDeleteDialog;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -29,14 +30,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
+import io.micrometer.common.util.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Getter
 @Setter
@@ -81,9 +82,17 @@ public class ProductEditor extends FormLayout {
                 quantityUnitKey);
         quantityLayout.setVerticalComponentAlignment(FlexComponent.Alignment.END, quantityUnit,
                 quantityUnitKey);
-        saveButton.addClickShortcut(Key.ENTER);
-        saveButton.addClickListener(event -> saveProduct());
+        saveButton.addClickListener(event -> {
+            saveProduct();
+
+        });
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(event -> {
+            ConfirmDeleteDialog dialog = new ConfirmDeleteDialog("Do you really " +
+                    "want to delete product " + product.getName() + "?");
+            dialog.addDeleteListener(e -> fireEvent(new DeleteEvent(this, product)));
+            add(dialog);
+        });
         cancelButton.addClickShortcut(Key.ESCAPE);
         cancelButton.addClickListener(event -> {
             setVisible(false);
@@ -119,39 +128,62 @@ public class ProductEditor extends FormLayout {
         fireEvent(new SaveEvent(this, product));
     }
 
-    private void initializeComponents(ProductTypeDto productType) throws EntityNotFoundException {
-        attributeFields = addAttributeFields(productType);
+    private void initializeComponents(ProductTypeDto productType, ProductDto product) throws EntityNotFoundException {
+        attributeFields = addAttributeFields(productType, product);
         add(heading, name, description, quantityLayout);
         attributeFields.forEach(this::add);
         add(saveButton, cancelButton, deleteButton);
     }
 
 
-    private List<Component> addAttributeFields(ProductTypeDto productTypeDto) throws EntityNotFoundException {
+    private List<Component> addAttributeFields(ProductTypeDto productTypeDto, ProductDto product) throws EntityNotFoundException {
         List<Component> components = new ArrayList<>();
+        List<AttributeDto> productAttributes = product.getAttributes();
         attributeTypesForProductType =
                 productTypeService.getAttributeTypesForProductType(productTypeDto);
         for (AttributeTypeDto attributeType : attributeTypesForProductType) {
+            String value = "";
+            Optional<AttributeDto> first =
+                    productAttributes.stream().filter(attr -> Objects.equals(attr.getAttributeType(), attributeType)).findFirst();
+            if (first.isPresent()) {
+                AttributeDto attributeDto = first.get();
+                value = attributeDto.getValue();
+            }
             if (BasicType.String.equals(attributeType.getBasicType())) {
                 TextField textField = new TextField(attributeType.getName());
                 textField.setRequired(attributeType.isRequired());
+                if (!StringUtils.isEmpty(value)) {
+                    textField.setValue(value);
+                }
                 components.add(textField);
             } else if (BasicType.Integer.equals(attributeType.getBasicType())) {
                 IntegerField integerField = new IntegerField(attributeType.getName());
                 integerField.setRequired(attributeType.isRequired());
+                if (!StringUtils.isEmpty(value)) {
+                    integerField.setValue(Integer.valueOf(value));
+                }
                 components.add(integerField);
             } else if (BasicType.Number.equals(attributeType.getBasicType())) {
                 NumberField numberField = new NumberField(attributeType.getName());
                 numberField.setRequired(attributeType.isRequired());
+                if (!StringUtils.isEmpty(value)) {
+                    numberField.setValue(Double.valueOf(value));
+                }
                 components.add(numberField);
             } else if (BasicType.Date.equals(attributeType.getBasicType())) {
                 DatePicker datePicker = new DatePicker(attributeType.getName());
                 datePicker.setLocale(Locale.GERMAN);
                 datePicker.setRequired(attributeType.isRequired());
+                if (!StringUtils.isEmpty(value)) {
+                    datePicker.setValue(LocalDate.parse(value));
+                }
                 components.add(datePicker);
             } else if (BasicType.DateTime.equals(attributeType.getBasicType())) {
                 DateTimePicker dateTimePicker = new DateTimePicker(attributeType.getName());
                 dateTimePicker.setLocale(Locale.GERMAN);
+                if (!StringUtils.isEmpty(value)) {
+                    dateTimePicker.setValue(LocalDateTime.parse(value));
+                }
                 components.add(dateTimePicker);
             }
         }
@@ -160,6 +192,10 @@ public class ProductEditor extends FormLayout {
 
     public void setEditorVisible(ProductDto product, ProductTypeDto productTypeDto,
                                  boolean create) throws EntityNotFoundException {
+        removeAll();
+        this.product = product;
+        this.productType = productTypeDto;
+
         if (create) {
             heading.setText("Create product");
             deleteButton.setVisible(false);
@@ -167,11 +203,21 @@ public class ProductEditor extends FormLayout {
             heading.setText("Edit product");
             deleteButton.setVisible(true);
         }
-        this.productType = productTypeDto;
-        initializeComponents(productTypeDto);
+        setQuantityAttributes(product);
+        initializeComponents(productTypeDto, product);
         setVisible(true);
-        this.product = product;
         binder.setBean(product);
+    }
+
+    private void setQuantityAttributes(ProductDto product) {
+        Quantity quantity = product.getQuantity();
+        quantityUnit.setValue(quantity.getQuantityUnit());
+        if (quantity.getQuantityValue() != null) {
+            quantityValue.setValue(quantity.getQuantityValue().intValue());
+        } else {
+            quantityValue.clear();
+        }
+        quantityUnitKey.setValue(quantity.getQuantityUnitKey());
     }
 
     public static abstract class ProductFormEvent extends ComponentEvent<ProductEditor> {

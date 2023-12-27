@@ -1,19 +1,19 @@
 package akletini.life.core.todo.dto;
 
+import akletini.life.core.shared.dto.BaseDto;
 import akletini.life.core.todo.repository.entity.Todo;
 import akletini.life.core.user.dto.UserDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
-public class TodoDto {
+@EqualsAndHashCode(callSuper = true)
+public class TodoDto extends BaseDto {
 
-    private Long id;
     private String title;
-    private LocalDateTime createdAt;
     private LocalDate dueAt;
     private String description;
     private TagDto tag;

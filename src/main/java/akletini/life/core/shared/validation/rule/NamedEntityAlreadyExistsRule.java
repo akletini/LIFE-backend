@@ -41,7 +41,10 @@ public class NamedEntityAlreadyExistsRule<T extends NamedEntity> implements Vali
         }
 
         if (getByName.isPresent()) {
-            return Optional.of(new EntityAlreadyExistsException(Errors.getError(Errors.ENITTY_ALREADY_EXISTS, validatable.getName())));
+            NamedEntity entity = (NamedEntity) getByName.get();
+            if (!entity.getId().equals(validatable.getId())) {
+                return Optional.of(new EntityAlreadyExistsException(Errors.getError(Errors.ENITTY_ALREADY_EXISTS, validatable.getName())));
+            }
         }
         return Optional.empty();
     }

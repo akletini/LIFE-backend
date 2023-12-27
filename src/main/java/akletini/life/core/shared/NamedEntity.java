@@ -10,5 +10,5 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class NamedEntity extends BaseEntity {
     @Column(unique = true)
-    private String name;
+    protected String name;
 }

@@ -1,11 +1,12 @@
 package akletini.life.core.todo.dto;
 
+import akletini.life.core.shared.dto.NamedDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class TagDto {
+@EqualsAndHashCode(callSuper = true)
+public class TagDto extends NamedDto {
 
-    private Long id;
-    private String name;
     private String color;
 }
