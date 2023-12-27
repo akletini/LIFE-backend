@@ -1,4 +1,4 @@
-package akletini.life.core.index;
+package akletini.life.core.index.service;
 
 import java.io.IOException;
 

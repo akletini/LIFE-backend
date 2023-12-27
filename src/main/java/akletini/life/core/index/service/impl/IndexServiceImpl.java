@@ -1,5 +1,7 @@
-package akletini.life.core.index;
+package akletini.life.core.index.service.impl;
 
+import akletini.life.core.index.Indexes;
+import akletini.life.core.index.service.IndexService;
 import akletini.life.core.product.repository.api.attributeType.AttributeTypeIndexRepository;
 import akletini.life.core.product.repository.api.attributeType.AttributeTypeRepository;
 import akletini.life.core.product.repository.api.product.ProductIndexRepository;

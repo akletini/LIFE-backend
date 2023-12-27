@@ -34,6 +34,10 @@ public class Errors {
         String TAG_NAME_UNIQUE = "tagNameUnique";
     }
 
+    public interface ATTRIBUTE_TYPE {
+        String ILLEGAL_TYPE_MIGRATION = "illegalTypeMigration";
+    }
+
 
     public static String getError(String errorMessage, Object... arguments) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("errors");

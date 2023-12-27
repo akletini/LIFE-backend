@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.io.Serializable;
 
@@ -22,8 +23,10 @@ import java.io.Serializable;
 @Document(indexName = "attribute_types")
 public class AttributeType extends NamedEntity implements Serializable {
 
+    @Field(index = false)
     private boolean required;
 
+    @Field(index = false)
     @Enumerated(EnumType.STRING)
     private BasicType basicType;
 }

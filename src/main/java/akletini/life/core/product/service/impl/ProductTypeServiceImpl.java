@@ -38,6 +38,14 @@ public class ProductTypeServiceImpl extends ProductTypeService {
     }
 
     @Override
+    public List<ProductType> getAllByAttributeType(AttributeType attributeType) {
+        List<ProductType> productTypes =
+                productTypeRepository.findByAttributeTypes_Id(attributeType.getId());
+        productTypes.forEach(this::addInheritedAttributeTypes);
+        return productTypes;
+    }
+
+    @Override
     public List<ProductType> getAll() {
         List<ProductType> all = super.getAll();
         all.forEach(this::addInheritedAttributeTypes);
@@ -119,7 +127,7 @@ public class ProductTypeServiceImpl extends ProductTypeService {
         return typesUpToRoot;
     }
 
-    private void addInheritedAttributeTypes(ProductType productType) {
+    private ProductType addInheritedAttributeTypes(ProductType productType) {
         List<AttributeType> attributeTypes = productType.getAttributeTypes() != null ?
                 new ArrayList<>(productType.getAttributeTypes()) : new ArrayList<>();
         Long parentId = productType.getParentProductType();
@@ -130,6 +138,7 @@ public class ProductTypeServiceImpl extends ProductTypeService {
             parentId = parentProductType.getParentProductType();
         }
         productType.setAttributeTypes(new LinkedHashSet<>(attributeTypes).stream().toList());
+        return productType;
     }
 
     @Override
@@ -151,10 +160,9 @@ public class ProductTypeServiceImpl extends ProductTypeService {
                 .toList();
 
         for (ProductType child : directChildren) {
-            childProductTypes.add(child);
+            childProductTypes.add(addInheritedAttributeTypes(child));
             findChildProductTypes(child.getId(), allProductTypes, childProductTypes);
         }
     }
-
 
 }

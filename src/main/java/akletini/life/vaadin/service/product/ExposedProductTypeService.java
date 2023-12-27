@@ -7,6 +7,7 @@ import akletini.life.core.product.dto.mapper.ProductTypeMapper;
 import akletini.life.core.product.repository.entity.AttributeType;
 import akletini.life.core.product.repository.entity.ProductType;
 import akletini.life.core.product.service.ProductTypeService;
+import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,9 @@ public class ExposedProductTypeService {
 
     public List<ProductTypeDto> getAll() {
         return productTypeService.getAll().stream().map(productTypeMapper::productTypeToDto).collect(Collectors.toList());
+    }
+
+    public ProductTypeDto store(ProductTypeDto productTypeDto) throws BusinessException {
+        return productTypeMapper.productTypeToDto(productTypeService.store(productTypeMapper.dtoToProductType(productTypeDto)));
     }
 }

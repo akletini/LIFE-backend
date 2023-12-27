@@ -6,6 +6,7 @@ import akletini.life.core.product.dto.ProductTypeDto;
 import akletini.life.core.product.repository.entity.BasicType;
 import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
+import akletini.life.vaadin.service.product.ExposedAttributeTypeService;
 import akletini.life.vaadin.service.product.ExposedProductService;
 import akletini.life.vaadin.service.product.ExposedProductTypeService;
 import akletini.life.vaadin.view.MainView;
@@ -13,6 +14,7 @@ import akletini.life.vaadin.view.components.ConfirmDeleteDialog;
 import akletini.life.vaadin.view.components.ErrorModal;
 import akletini.life.vaadin.view.components.PagedGridView;
 import akletini.life.vaadin.view.components.Pagination;
+import akletini.life.vaadin.view.productType.ProductTypeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -48,6 +50,7 @@ public class ProductView extends VerticalLayout implements PagedGridView {
 
     private final ExposedProductService productService;
     private final ExposedProductTypeService productTypeService;
+    private final ExposedAttributeTypeService attributeTypeService;
     private final Grid<ProductDto> grid;
     private final TreeGrid<ProductTypeDto> productTypeGrid;
     private final Pagination pagination;
@@ -56,12 +59,16 @@ public class ProductView extends VerticalLayout implements PagedGridView {
     private TextField searchInput;
     private Button executeSearchButton;
     private Button newProductButton;
+    private Button attributeTypesButton;
     private ProductEditor productEditor;
+    private ProductTypeView productTypeView;
 
     public ProductView(ExposedProductService productService,
-                       ExposedProductTypeService productTypeService) throws EntityNotFoundException {
+                       ExposedProductTypeService productTypeService,
+                       ExposedAttributeTypeService attributeTypeService) throws EntityNotFoundException {
         this.productService = productService;
         this.productTypeService = productTypeService;
+        this.attributeTypeService = attributeTypeService;
         H1 title = new H1("Products page");
         grid = new Grid<>();
         initializeGrid();
@@ -99,8 +106,13 @@ public class ProductView extends VerticalLayout implements PagedGridView {
             });
             add(productTypeSelectionPanel);
         });
-        layout.setVerticalComponentAlignment(Alignment.END, executeSearchButton, newProductButton);
-        layout.add(searchInput, executeSearchButton, newProductButton);
+        attributeTypesButton = new Button("Attribute types");
+        attributeTypesButton.addClickListener(event -> {
+            attributeTypesButton.getUI().ifPresent(ui -> ui.navigate("/products/attribute-types"));
+        });
+        layout.setVerticalComponentAlignment(Alignment.END, executeSearchButton, newProductButton
+                , attributeTypesButton);
+        layout.add(searchInput, executeSearchButton, newProductButton, attributeTypesButton);
         return layout;
     }
 
@@ -131,8 +143,14 @@ public class ProductView extends VerticalLayout implements PagedGridView {
                 .setTooltipGenerator(ProductTypeDto::getName);
         GridContextMenu<ProductTypeDto> menu = productTypeGrid.addContextMenu();
         menu.addItem("Add", event -> {
+            productTypeView = new ProductTypeView(productTypeService, event.getItem().get(), true);
+            productTypeView.addSaveListener(this::saveProductType);
+            add(productTypeView);
         });
         menu.addItem("Edit", event -> {
+            productTypeView = new ProductTypeView(productTypeService, event.getItem().get(), false);
+            productTypeView.addSaveListener(this::saveProductType);
+            add(productTypeView);
         });
         menu.addItem("Delete", event -> {
         });
@@ -237,6 +255,15 @@ public class ProductView extends VerticalLayout implements PagedGridView {
             productService.store(saveEvent.getProduct());
             productEditor.setVisible(false);
             productEditor.removeAll();
+        } catch (BusinessException e) {
+            add(new ErrorModal(e.getMessage()));
+        }
+    }
+
+    private void saveProductType(ProductTypeView.SaveEvent saveEvent) {
+        try {
+            productTypeService.store(saveEvent.getProductTypeDto());
+            productTypeView.getEditorDialog().close();
         } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }

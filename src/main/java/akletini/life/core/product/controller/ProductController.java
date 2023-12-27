@@ -1,7 +1,7 @@
 package akletini.life.core.product.controller;
 
-import akletini.life.core.index.IndexService;
 import akletini.life.core.index.Indexes;
+import akletini.life.core.index.service.IndexService;
 import akletini.life.core.product.dto.ProductDto;
 import akletini.life.core.product.dto.mapper.ProductMapper;
 import akletini.life.core.product.repository.entity.Product;

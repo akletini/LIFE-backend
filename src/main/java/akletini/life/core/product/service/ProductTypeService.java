@@ -10,6 +10,8 @@ import java.util.Map;
 
 public abstract class ProductTypeService extends EntityService<ProductType> {
 
+    public abstract List<ProductType> getAllByAttributeType(AttributeType attributeType);
+
     public abstract ProductType getByName(String name) throws EntityNotFoundException;
 
     public abstract List<AttributeType> getAttributeTypesForProductType(ProductType productType) throws EntityNotFoundException;

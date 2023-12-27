@@ -26,7 +26,7 @@ public class ConfirmDeleteDialog extends VerticalLayout {
         deleteButton.addClickListener(event -> fireEvent(new DeleteEvent(this)));
         Button cancelButton = new Button("Cancel");
         cancelButton.addClickListener(event -> dialog.close());
-        layout.add(cancelButton, deleteButton);
+        layout.add(deleteButton, cancelButton);
         dialog.getFooter().add(layout);
         add(dialog);
         dialog.open();
