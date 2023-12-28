@@ -4,6 +4,7 @@ import akletini.life.core.product.dto.AttributeTypeDto;
 import akletini.life.core.product.repository.entity.BasicType;
 import akletini.life.core.shared.dto.NamedDto;
 import akletini.life.core.shared.validation.exception.BusinessException;
+import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import akletini.life.vaadin.service.product.ExposedAttributeTypeService;
 import akletini.life.vaadin.view.MainView;
 import akletini.life.vaadin.view.components.ErrorModal;
@@ -52,7 +53,7 @@ public class AttributeTypeView extends VerticalLayout implements PagedGridView {
         this.attributeTypeService = attributeTypeService;
         H1 heading = new H1("Attribute types page");
         grid = new Grid<>();
-        pagination = new Pagination(10, 1);
+        pagination = new Pagination(10, 1, 0);
         buttonLayout = createButtonLayout();
         initGrid();
         add(heading, buttonLayout, grid, pagination);
@@ -96,7 +97,6 @@ public class AttributeTypeView extends VerticalLayout implements PagedGridView {
                 .setHeader("Basic type")
                 .setSortable(true)
                 .setEditorComponent(attributeTypeDto -> {
-
                     basicTypeSelect.setItems(BasicType.values());
                     basicTypeSelect.setValue(attributeTypeDto.getBasicType());
                     return basicTypeSelect;
@@ -176,10 +176,12 @@ public class AttributeTypeView extends VerticalLayout implements PagedGridView {
                     attributeTypeService.getAttributeTypes(pagination.currentPage,
                             pagination.pageSize, searchField.getValue());
             grid.setItems(attributeTypes.toList());
-            pagination.pageSize = attributeTypes.getSize();
-            pagination.totalPages = attributeTypes.getTotalPages();
+            pagination.reloadLabels(attributeTypes.getSize(), attributeTypes.getTotalPages(),
+                    attributeTypes.getTotalElements());
         } catch (IOException e) {
             add(new ErrorModal(e.getMessage()));
+        } catch (EntityNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }

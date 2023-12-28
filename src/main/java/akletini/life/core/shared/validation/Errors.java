@@ -38,6 +38,10 @@ public class Errors {
         String ILLEGAL_TYPE_MIGRATION = "illegalTypeMigration";
     }
 
+    public interface PRODUCT_TYPE {
+        String DUPLICATE_ATTRIBUTES = "duplicateAttributes";
+    }
+
 
     public static String getError(String errorMessage, Object... arguments) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("errors");

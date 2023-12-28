@@ -16,6 +16,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -114,9 +115,15 @@ public class ProductEditor extends FormLayout {
             } else if (component instanceof NumberField numberField) {
                 value = String.valueOf(numberField.getValue());
             } else if (component instanceof DatePicker datePicker) {
-                value = datePicker.getValue().toString();
+                Optional<LocalDate> optionalValue = datePicker.getOptionalValue();
+                if (optionalValue.isPresent()) {
+                    value = optionalValue.get().toString();
+                }
             } else if (component instanceof DateTimePicker dateTimePicker) {
-                value = dateTimePicker.getValue().toString();
+                Optional<LocalDateTime> optionalValue = dateTimePicker.getOptionalValue();
+                if (optionalValue.isPresent()) {
+                    value = optionalValue.get().toString();
+                }
             }
             attributes.add(new AttributeDto(attributeTypesForProductType.get(i), value));
         }
@@ -170,6 +177,10 @@ public class ProductEditor extends FormLayout {
                     numberField.setValue(Double.valueOf(value));
                 }
                 components.add(numberField);
+            } else if (BasicType.Boolean.equals(attributeType.getBasicType())) {
+                Checkbox booleanField = new Checkbox(attributeType.getName());
+                booleanField.setValue(Boolean.parseBoolean(value));
+                components.add(booleanField);
             } else if (BasicType.Date.equals(attributeType.getBasicType())) {
                 DatePicker datePicker = new DatePicker(attributeType.getName());
                 datePicker.setLocale(Locale.GERMAN);

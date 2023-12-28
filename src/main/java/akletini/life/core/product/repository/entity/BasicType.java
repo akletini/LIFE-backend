@@ -5,5 +5,6 @@ public enum BasicType {
     Date,
     DateTime,
     Number,
-    Integer
+    Integer,
+    Boolean
 }

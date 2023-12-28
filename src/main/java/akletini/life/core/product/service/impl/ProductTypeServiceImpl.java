@@ -4,12 +4,14 @@ import akletini.life.core.product.repository.api.productType.ProductTypeIndexRep
 import akletini.life.core.product.repository.api.productType.ProductTypeRepository;
 import akletini.life.core.product.repository.entity.AttributeType;
 import akletini.life.core.product.repository.entity.ProductType;
+import akletini.life.core.product.service.ProductService;
 import akletini.life.core.product.service.ProductTypeService;
 import akletini.life.core.shared.validation.Errors;
 import akletini.life.core.shared.validation.exception.BusinessException;
 import akletini.life.core.shared.validation.exception.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,6 +23,8 @@ public class ProductTypeServiceImpl extends ProductTypeService {
 
     private final ProductTypeRepository productTypeRepository;
     private final ProductTypeIndexRepository productTypeIndexRepository;
+    @Lazy
+    private final ProductService productService;
 
     @Override
     public ProductType store(ProductType productType) throws BusinessException {
@@ -28,6 +32,14 @@ public class ProductTypeServiceImpl extends ProductTypeService {
         addInheritedAttributeTypes(stored);
         productTypeIndexRepository.save(stored);
         return stored;
+    }
+
+    @Override
+    public void delete(ProductType productType) {
+        productService.deleteByProductType(productType);
+        super.delete(productType);
+        productTypeIndexRepository.delete(productType);
+
     }
 
     @Override
@@ -134,6 +146,7 @@ public class ProductTypeServiceImpl extends ProductTypeService {
         while (parentId != null) {
             ProductType parentProductType =
                     productTypeRepository.findById(parentId).orElseThrow();
+            parentProductType.getAttributeTypes().forEach(attributeType -> attributeType.setInheritedBy(parentProductType.getId()));
             attributeTypes.addAll(parentProductType.getAttributeTypes());
             parentId = parentProductType.getParentProductType();
         }

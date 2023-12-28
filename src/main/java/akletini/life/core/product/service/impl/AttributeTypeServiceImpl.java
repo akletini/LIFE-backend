@@ -51,10 +51,6 @@ public class AttributeTypeServiceImpl extends AttributeTypeService {
         return stored;
     }
 
-    public List<AttributeType> getAll() {
-        return attributeTypeRepository.findAll();
-    }
-
     @Override
     public AttributeType getByName(String typeName) throws EntityNotFoundException {
         return attributeTypeRepository.findByName(typeName).orElseThrow(() -> {

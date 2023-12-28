@@ -23,17 +23,20 @@ public class Pagination extends HorizontalLayout {
     public int currentPage;
     public int totalPages;
     public int pageSize;
+    public long totalElements;
     final Button refresh;
     final Span label1;
     final Span label2;
     final Span label3;
+    final Span label4;
     Select<Integer> pageSizeSelect;
     IntegerField pageInput;
 
-    public Pagination(int pageSize, int totalPages) {
+    public Pagination(int pageSize, int totalPages, long totalElements) {
         currentPage = 0;
         this.pageSize = pageSize;
         this.totalPages = totalPages;
+        this.totalElements = totalElements;
 
         firstPage = new Button();
         firstPage.setIcon(new Icon(VaadinIcon.ANGLE_DOUBLE_LEFT));
@@ -84,13 +87,14 @@ public class Pagination extends HorizontalLayout {
         label1 = new Span("Showing ");
         label2 = new Span(" items on page ");
         label3 = new Span(" out of " + this.totalPages);
+        label4 = new Span(" (" + this.totalElements + " items total)");
 
         getStyle().set("margin-left", "auto").set("padding", "15px");
         setAlignItems(Alignment.END);
-        setVerticalComponentAlignment(Alignment.CENTER, label1, label2, pageInput, label3);
+        setVerticalComponentAlignment(Alignment.CENTER, label1, label2, pageInput, label3, label4);
         setJustifyContentMode(JustifyContentMode.END);
         add(firstPage, previous, next, lastPage, label1, pageSizeSelect, label2,
-                pageInput, label3, refresh);
+                pageInput, label3, refresh, label4);
     }
 
     public void previousPage() {
@@ -127,8 +131,15 @@ public class Pagination extends HorizontalLayout {
 
     public void refresh() {
         fireEvent(new PaginationEvent(this, currentPage, pageSize));
+    }
+
+    public void reloadLabels(int pageSize, int totalPages, long totalElements) {
         setNavigationEnabled();
+        this.pageSize = pageSize;
+        this.totalPages = totalPages;
+        this.totalElements = totalElements;
         label3.setText(" out of " + totalPages);
+        label4.setText(" (" + this.totalElements + " items total)");
     }
 
     public static class PaginationEvent extends ComponentEvent<Pagination> {

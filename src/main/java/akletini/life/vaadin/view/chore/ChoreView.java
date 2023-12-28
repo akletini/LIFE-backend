@@ -64,13 +64,12 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
 
         H1 title = new H1("Chore page");
         choreGrid = new Grid<>();
-        initializeGrid(choreGrid);
-//        HorizontalLayout inputLayout = createInputLayout();
         HorizontalLayout filterLayout = createFilterLayout();
-        pagination = new Pagination(pageSize, chores.getTotalPages());
+
+        pagination = new Pagination(10, 0, 0);
         pagination.addQueryListener(event -> query());
         configureEditor();
-
+        initializeGrid(choreGrid);
         add(getEditorLayout(new VerticalLayout(title, filterLayout, choreGrid,
                 pagination)));
     }
@@ -109,8 +108,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
     }
 
     private void initializeGrid(Grid<ChoreDto> grid) {
-        chores = choreService.getChores(currentPage, pageSize, Optional.empty(),
-                Optional.of(List.of(ACTIVE)));
+        query();
         grid.setItems(chores.toList());
         grid.addColumn(ChoreDto::getTitle)
                 .setHeader("Title")
@@ -199,7 +197,7 @@ public class ChoreView extends VerticalLayout implements PagedGridView {
                 Optional.ofNullable(sortingConstants != null ? sortingConstants.name() : null),
                 Optional.of(new ArrayList<>(filterSelect.getSelectedItems())));
         this.chores = chorePage;
-        pagination.pageSize = chorePage.getSize();
-        pagination.totalPages = chorePage.getTotalPages();
+        pagination.reloadLabels(chorePage.getSize(), chorePage.getTotalPages(),
+                chorePage.getTotalElements());
     }
 }

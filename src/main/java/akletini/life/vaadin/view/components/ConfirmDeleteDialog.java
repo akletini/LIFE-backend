@@ -22,7 +22,7 @@ public class ConfirmDeleteDialog extends VerticalLayout {
         Button deleteButton = new Button("Delete");
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ICON,
                 ButtonVariant.LUMO_ERROR,
-                ButtonVariant.LUMO_TERTIARY);
+                ButtonVariant.LUMO_PRIMARY);
         deleteButton.addClickListener(event -> fireEvent(new DeleteEvent(this)));
         Button cancelButton = new Button("Cancel");
         cancelButton.addClickListener(event -> dialog.close());

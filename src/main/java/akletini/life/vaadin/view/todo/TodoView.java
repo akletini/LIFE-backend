@@ -41,7 +41,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static akletini.life.core.shared.constants.FilterConstants.OPEN;
 import static akletini.life.core.shared.utils.DateUtils.DATE_FORMAT;
 import static akletini.life.core.shared.utils.DateUtils.DATE_TIME_FORMAT;
 
@@ -59,7 +58,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
     private final MultiSelectComboBox<TagDto> tagComboBox;
     private final Select<String> sortSelect;
     private final Grid<TodoDto> todoGrid;
-    private List<TodoDto> todos;
+    private List<TodoDto> todos = new ArrayList<>();
     private DatePicker datePicker;
     private TextField input;
     private int currentPage = 0;
@@ -76,7 +75,6 @@ public class TodoView extends VerticalLayout implements PagedGridView {
 
         H1 title = new H1("Todo page");
         todoGrid = new Grid<>();
-        initializeGrid(todoGrid);
         HorizontalLayout createTodoLayout = new HorizontalLayout();
         input = new TextField("Title");
         input.setPlaceholder("Enter todo title...");
@@ -129,13 +127,15 @@ public class TodoView extends VerticalLayout implements PagedGridView {
         configureTodoEditor();
         configureTagEditor();
 
+
         mainContent = new VerticalLayout(title, createTodoLayout, filterLayout, todoGrid);
         content = getContent();
         add(content);
 
-        pagination = new Pagination(pageSize, todoPage.getTotalPages());
+        pagination = new Pagination(10, 0, 0);
         pagination.addQueryListener(event -> query());
         add(pagination);
+        initializeGrid(todoGrid);
 
         setAlignItems(Alignment.CENTER);
     }
@@ -166,9 +166,7 @@ public class TodoView extends VerticalLayout implements PagedGridView {
     }
 
     private void initializeGrid(Grid<TodoDto> todoGrid) {
-        todoPage = todoService.getTodos(currentPage, pageSize, Optional.empty(),
-                Optional.of(OPEN),
-                Optional.empty());
+        query();
         todos = new ArrayList<>(todoPage.toList());
         todoGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         todoGrid.setItems(todos.stream().toList());
@@ -294,8 +292,8 @@ public class TodoView extends VerticalLayout implements PagedGridView {
         todos.addAll(todoPage.get().toList());
         this.todoPage = todoPage;
         todoGrid.setItems(todos);
-        pagination.pageSize = todoPage.getSize();
-        pagination.totalPages = todoPage.getTotalPages();
+        pagination.reloadLabels(todoPage.getSize(), todoPage.getTotalPages(),
+                todoPage.getTotalElements());
     }
 
     private void configureTagEditor() {

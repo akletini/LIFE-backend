@@ -1,6 +1,7 @@
 package akletini.life.core.product.validation;
 
 import akletini.life.core.product.repository.entity.ProductType;
+import akletini.life.core.product.validation.rule.productType.DuplicateAttributesRule;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.ValidationRule;
 import akletini.life.core.shared.validation.rule.EntityNotNullRule;
@@ -16,12 +17,14 @@ import java.util.List;
 public class ProductTypeValidation implements EntityValidation<ProductType> {
     private final NamedEntityAlreadyExistsRule<ProductType> entityAlreadyExistsRule;
     private final EntityNotNullRule<ProductType> entityNotNullRule;
+    private final DuplicateAttributesRule duplicateAttributesRule;
 
     @Override
     public List<ValidationRule<ProductType>> getValidationRules() {
         ArrayList<ValidationRule<ProductType>> rules = new ArrayList<>();
         rules.add(entityNotNullRule);
         rules.add(entityAlreadyExistsRule);
+        rules.add(duplicateAttributesRule);
         return rules;
     }
 }

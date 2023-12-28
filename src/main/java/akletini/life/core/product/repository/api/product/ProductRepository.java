@@ -12,4 +12,6 @@ public interface ProductRepository extends ListCrudRepository<Product, Long>,
         ListPagingAndSortingRepository<Product, Long> {
     Optional<Product> findByName(String name);
 
+    void deleteByProductType_Id(Long id);
+
 }

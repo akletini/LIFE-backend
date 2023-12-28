@@ -31,6 +31,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class ProductView extends VerticalLayout implements PagedGridView {
     private Button attributeTypesButton;
     private ProductEditor productEditor;
     private ProductTypeView productTypeView;
+    private ConfirmDeleteDialog confirmDeleteProductTypeDialog;
 
     public ProductView(ExposedProductService productService,
                        ExposedProductTypeService productTypeService,
@@ -75,7 +77,7 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         productTypeGrid = new TreeGrid<>();
         initializeTreeGrid();
         Component searchLayout = createSearchLayout();
-        pagination = new Pagination(10, 1);
+        pagination = new Pagination(10, 1, 0);
         pagination.addQueryListener(event -> query());
         initializeMainContentLayout();
         configureEditor();
@@ -131,30 +133,40 @@ public class ProductView extends VerticalLayout implements PagedGridView {
     }
 
     private void initializeTreeGrid() {
-        List<ProductTypeDto> productTypeHierarchy =
-                productTypeService.constructHierarchy();
-        ProductTypeDto rootProductType =
-                productTypeHierarchy.stream().filter(productTypeDto -> productTypeDto.getParentProductType() == null).findFirst().orElseThrow();
-        productTypeGrid.setItems(new ArrayList<>(List.of(rootProductType)),
-                ProductTypeDto::getChildProductTypes);
+        initProductTypeTreedata();
         productTypeGrid.addHierarchyColumn(ProductTypeDto::getName)
                 .setHeader("Product types")
                 .setAutoWidth(true)
                 .setTooltipGenerator(ProductTypeDto::getName);
         GridContextMenu<ProductTypeDto> menu = productTypeGrid.addContextMenu();
         menu.addItem("Add", event -> {
-            productTypeView = new ProductTypeView(productTypeService, event.getItem().get(), true);
+            productTypeView = new ProductTypeView(productTypeService, attributeTypeService,
+                    event.getItem().get(), true);
             productTypeView.addSaveListener(this::saveProductType);
             add(productTypeView);
         });
         menu.addItem("Edit", event -> {
-            productTypeView = new ProductTypeView(productTypeService, event.getItem().get(), false);
+            productTypeView = new ProductTypeView(productTypeService, attributeTypeService,
+                    event.getItem().get(), false);
             productTypeView.addSaveListener(this::saveProductType);
             add(productTypeView);
         });
         menu.addItem("Delete", event -> {
+            confirmDeleteProductTypeDialog = new ConfirmDeleteDialog("Do you really want" +
+                    " to delete product type " + event.getItem().get().getName() + "?");
+            add(confirmDeleteProductTypeDialog);
+            confirmDeleteProductTypeDialog.addDeleteListener(e -> deleteProductType(event.getItem().get()));
         });
         productTypeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+    }
+
+    private void initProductTypeTreedata() {
+        List<ProductTypeDto> productTypeHierarchy =
+                productTypeService.constructHierarchy();
+        ProductTypeDto rootProductType =
+                productTypeHierarchy.stream().filter(productTypeDto -> productTypeDto.getParentProductType() == null).findFirst().orElseThrow();
+        productTypeGrid.setItems(new ArrayList<>(List.of(rootProductType)),
+                ProductTypeDto::getChildProductTypes);
     }
 
     private void initializeGrid() {
@@ -170,6 +182,10 @@ public class ProductView extends VerticalLayout implements PagedGridView {
             List<String> attributes = new ArrayList<>();
             for (AttributeDto attribute : productDto.getAttributes()) {
                 String value = attribute.getValue();
+                // write only filled out attributes
+                if (StringUtils.isEmpty(value)) {
+                    continue;
+                }
                 if (BasicType.Date.equals(attribute.getAttributeType().getBasicType())) {
                     value = LocalDate.parse(value).format(DateTimeFormatter.ofPattern(DATE_FORMAT));
                 } else if (BasicType.DateTime.equals(attribute.getAttributeType().getBasicType())) {
@@ -228,6 +244,12 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         productService.delete(productDto);
     }
 
+    private void deleteProductType(ProductTypeDto productTypeDto) {
+        remove(confirmDeleteProductTypeDialog);
+        productTypeService.delete(productTypeDto);
+        initProductTypeTreedata();
+    }
+
     @Override
     public void query() {
         try {
@@ -242,8 +264,8 @@ public class ProductView extends VerticalLayout implements PagedGridView {
                     productTypeId,
                     true,
                     searchInput.getValue());
-            pagination.pageSize = products.getSize();
-            pagination.totalPages = products.getTotalPages();
+            pagination.reloadLabels(products.getSize(), products.getTotalPages(),
+                    products.getTotalElements());
             grid.setItems(this.products.toList());
         } catch (IOException | EntityNotFoundException e) {
             add(new ErrorModal(e.getMessage()));
@@ -264,6 +286,7 @@ public class ProductView extends VerticalLayout implements PagedGridView {
         try {
             productTypeService.store(saveEvent.getProductTypeDto());
             productTypeView.getEditorDialog().close();
+            initProductTypeTreedata();
         } catch (BusinessException e) {
             add(new ErrorModal(e.getMessage()));
         }

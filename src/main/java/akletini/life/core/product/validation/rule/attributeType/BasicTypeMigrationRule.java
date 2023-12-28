@@ -1,4 +1,4 @@
-package akletini.life.core.product.validation.rule;
+package akletini.life.core.product.validation.rule.attributeType;
 
 import akletini.life.core.product.repository.api.attributeType.AttributeTypeRepository;
 import akletini.life.core.product.repository.entity.AttributeType;
@@ -25,17 +25,20 @@ public class BasicTypeMigrationRule implements ValidationRule<AttributeType> {
 
     @Override
     public Optional<BusinessException> validate(AttributeType validatable) {
-        Optional<AttributeType> attributeTypeOptional =
-                attributeTypeRepository.findById(validatable.getId());
-        if (attributeTypeOptional.isPresent()) {
-            AttributeType attributeType = attributeTypeOptional.get();
-            BasicType oldBasicType = attributeType.getBasicType();
-            BasicType newBasicType = validatable.getBasicType();
-            Map<BasicType, List<BasicType>> allowedTypeMigrations = getAllowedTypeMigrations();
-            for (Map.Entry<BasicType, List<BasicType>> entry : allowedTypeMigrations.entrySet()) {
-                if (entry.getKey().equals(oldBasicType)) {
-                    if (!entry.getValue().contains(newBasicType)) {
-                        return Optional.of(new InvalidDataException(Errors.getError(ILLEGAL_TYPE_MIGRATION, oldBasicType, entry.getValue())));
+        if (validatable.getId() != null) {
+            Optional<AttributeType> attributeTypeOptional =
+                    attributeTypeRepository.findById(validatable.getId());
+            if (attributeTypeOptional.isPresent()) {
+                AttributeType attributeType = attributeTypeOptional.get();
+                BasicType oldBasicType = attributeType.getBasicType();
+                BasicType newBasicType = validatable.getBasicType();
+                Map<BasicType, List<BasicType>> allowedTypeMigrations = getAllowedTypeMigrations();
+                for (Map.Entry<BasicType, List<BasicType>> entry :
+                        allowedTypeMigrations.entrySet()) {
+                    if (entry.getKey().equals(oldBasicType)) {
+                        if (!entry.getValue().contains(newBasicType)) {
+                            return Optional.of(new InvalidDataException(Errors.getError(ILLEGAL_TYPE_MIGRATION, oldBasicType, entry.getValue())));
+                        }
                     }
                 }
             }
@@ -52,6 +55,7 @@ public class BasicTypeMigrationRule implements ValidationRule<AttributeType> {
                 BasicType.DateTime));
         allowedTypeMigrations.put(BasicType.Integer, List.of(BasicType.String, BasicType.Number));
         allowedTypeMigrations.put(BasicType.Number, List.of(BasicType.String, BasicType.Integer));
+        allowedTypeMigrations.put(BasicType.Boolean, List.of(BasicType.String, BasicType.Boolean));
         return allowedTypeMigrations;
     }
 }

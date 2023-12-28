@@ -32,6 +32,13 @@ public class ProductType extends NamedEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "attribute_types_id")
     @ToString.Exclude
-    @Field(type = FieldType.Nested)
+    @Field(type = FieldType.Object)
     private List<AttributeType> attributeTypes;
+
+    @PreRemove
+    void preRemove() {
+        if (attributeTypes != null) {
+            attributeTypes = null;
+        }
+    }
 }

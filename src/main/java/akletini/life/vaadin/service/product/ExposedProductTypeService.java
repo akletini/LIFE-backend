@@ -40,7 +40,13 @@ public class ExposedProductTypeService {
     public List<AttributeTypeDto> getAttributeTypesForProductType(ProductTypeDto productTypeDto) throws EntityNotFoundException {
         List<AttributeType> attributeTypesForProductType =
                 productTypeService.getAttributeTypesForProductType(productTypeMapper.dtoToProductType(productTypeDto));
-        return attributeTypesForProductType.stream().map(attributeTypeMapper::attributeTypeToDto).collect(Collectors.toList());
+        List<AttributeTypeDto> list = new ArrayList<>();
+        for (AttributeType attributeType : attributeTypesForProductType) {
+            AttributeTypeDto attributeTypeDto =
+                    attributeTypeMapper.attributeTypeToDto(attributeType);
+            list.add(attributeTypeDto);
+        }
+        return list;
     }
 
     public List<ProductTypeDto> getAll() {
@@ -49,5 +55,9 @@ public class ExposedProductTypeService {
 
     public ProductTypeDto store(ProductTypeDto productTypeDto) throws BusinessException {
         return productTypeMapper.productTypeToDto(productTypeService.store(productTypeMapper.dtoToProductType(productTypeDto)));
+    }
+
+    public void delete(ProductTypeDto productTypeDto) {
+        productTypeService.delete(productTypeMapper.dtoToProductType(productTypeDto));
     }
 }

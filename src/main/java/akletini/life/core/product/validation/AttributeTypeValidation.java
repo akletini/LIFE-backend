@@ -1,7 +1,7 @@
 package akletini.life.core.product.validation;
 
 import akletini.life.core.product.repository.entity.AttributeType;
-import akletini.life.core.product.validation.rule.BasicTypeMigrationRule;
+import akletini.life.core.product.validation.rule.attributeType.BasicTypeMigrationRule;
 import akletini.life.core.shared.validation.EntityValidation;
 import akletini.life.core.shared.validation.ValidationRule;
 import akletini.life.core.shared.validation.rule.EntityNotNullRule;

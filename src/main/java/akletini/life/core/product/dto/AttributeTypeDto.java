@@ -13,4 +13,6 @@ public class AttributeTypeDto extends NamedDto {
     private boolean required;
 
     private BasicType basicType;
+
+    private ProductTypeDto inheritedBy;
 }

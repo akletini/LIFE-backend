@@ -54,7 +54,7 @@ public abstract class EntityService<T extends BaseEntity> {
     }
 
     public T getById(Long id) throws EntityNotFoundException {
-        log.info("Searching entity with id {}", id);
+        log.trace("Searching entity with id {}", id);
         return entityRepository.findById(id).orElseThrow(() -> {
             EntityNotFoundException exception =
                     new EntityNotFoundException(Errors.getError(Errors.ENTITY_NOT_FOUND,
